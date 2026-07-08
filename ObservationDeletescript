@@ -1,0 +1,68 @@
+  --select * from Companys
+  select * from Users
+  --select * from ScopedUsers
+  --select * from ScopedUserRoles --'SUPERVISIOR' RoleId
+  --select * from UserScopedSites --BloomField all sites
+
+  select * from UserRoles
+  select * from ScopedUserRoles
+  select * from roles
+
+    select * from scopeduserroles
+  select * from ScopedUsers
+  select * from UserScopedSites
+
+  select * from ListedUsers
+
+
+
+SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+WHERE TABLE_NAME = 'ScopedUsers' 
+AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+
+select * from ObservedPersons where SafetyObservationId='d9c34041-03ca-4ce4-bd25-c673b29f2f8e'
+
+select * from ListedUsers
+
+ALTER TABLE dbo.ScopedUsers 
+DROP CONSTRAINT FK_ScopedUsers_Users_UserId
+
+select * from scopeduserroles
+
+  --select * from Users where CompanyId='8496071F-AE46-499F-88D8-EF1A6C45C22D';
+
+  DECLARE @CompanyId UNIQUEIDENTIFIER = 'C97FE366-6B42-4A52-9D78-80936E753717';
+  
+  DELETE FROM safetytaskresponses
+    WHERE safetyobservationid IN (SELECT Id FROM safetyobservations WHERE companyid = @CompanyId);
+
+    DELETE FROM safetyobservationchecklists
+    WHERE safetyobservationid IN (SELECT Id FROM safetyobservations WHERE companyid = @CompanyId);
+
+    DELETE FROM SafetyObservationReviews
+    WHERE safetyobservationid IN (SELECT Id FROM safetyobservations WHERE companyid = @CompanyId);
+
+    DELETE FROM ObservedPersons
+    WHERE safetyobservationid IN (SELECT Id FROM safetyobservations WHERE companyid = @CompanyId);
+
+    DELETE FROM safetyobservations WHERE companyid = @CompanyId;
+
+    DELETE FROM ListedUsers WHERE companyid = @CompanyId;
+
+    DELETE FROM scheduledtasks WHERE companyid = @CompanyId;
+
+		delete  from ScopedUserRoles where scopeduserid in  (select id from ScopedUsers where companyid = @CompanyId)
+
+		delete  from UserScopedSites  where companyid = @CompanyId
+
+
+	delete from ScopedUsers where companyid = @CompanyId;
+
+	 --select * from UserScopedSites
+
+
+	
+
+
+
+
