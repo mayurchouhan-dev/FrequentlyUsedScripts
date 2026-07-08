@@ -12,7 +12,7 @@
 
 
 
-DECLARE @CompanyId UNIQUEIDENTIFIER = 'C97FE366-6B42-4A52-9D78-80936E753717';
+DECLARE @CompanyId UNIQUEIDENTIFIER = '9BAE4C2C-9D16-429F-A385-19199D0257AB';
 DECLARE @CommitTransaction BIT = 1;  -- 1 = commit, 0 = rollback
 
 BEGIN TRY
@@ -124,11 +124,12 @@ BEGIN TRY
 
     DELETE FROM UserScopedSites WHERE companyid = @CompanyId;
 
-    DELETE FROM scopeduserroles
-    WHERE scopeduserid IN (SELECT id FROM scopedusers WHERE userId IN (SELECT id FROM users WHERE companyid = @CompanyId));
+	    DELETE FROM scopeduserroles
+    WHERE scopeduserid IN (SELECT id FROM scopedusers WHERE companyid = @CompanyId);
+
+    DELETE FROM scopedusers WHERE  companyid = @CompanyId;
 
 	--DECLARE @CompanyId UNIQUEIDENTIFIER = '8496071F-AE46-499F-88D8-EF1A6C45C22D';
-    DELETE FROM scopedusers WHERE userId IN (SELECT id FROM users WHERE companyid = @CompanyId);
 
     DELETE FROM users WHERE companyid = @CompanyId;
 
