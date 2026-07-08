@@ -1,0 +1,208 @@
+--select * from marathonuserasscoped
+
+--truncate table marathonuserasscoped
+
+--select * from Companys
+
+--select * from Companys
+
+--select * from Users
+--select * from Tenants where name like '%bloom%'
+
+
+
+
+DECLARE @CompanyId UNIQUEIDENTIFIER = 'C97FE366-6B42-4A52-9D78-80936E753717';
+DECLARE @CommitTransaction BIT = 1;  -- 1 = commit, 0 = rollback
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- Delete sequence (kept same ordering as provided)
+    DELETE FROM alerts WHERE companyid = @CompanyId;
+
+    DELETE FROM ReportFilters
+    WHERE ReportObjectDetailId IN (
+        SELECT Id FROM ReportObjectDetails
+        WHERE CompanyReportMappingId IN (
+            SELECT id FROM CompanyReportMappings WHERE companyid = @CompanyId
+        )
+    );
+
+    DELETE FROM ReportSchedules
+    WHERE reportid IN (
+        SELECT Id FROM ReportObjectDetails
+        WHERE CompanyReportMappingId IN (
+            SELECT id FROM CompanyReportMappings WHERE companyid = @CompanyId
+        )
+    );
+
+    DELETE FROM ReportObjectDetails
+    WHERE CompanyReportMappingId IN (
+        SELECT id FROM CompanyReportMappings WHERE companyid = @CompanyId
+    );
+
+    DELETE FROM CompanyReportMappings WHERE companyid = @CompanyId;
+
+    DELETE FROM CompanyTransactions WHERE companyid = @CompanyId;
+
+    DELETE FROM companyusers WHERE companyid = @CompanyId;
+
+    DELETE FROM companyzones WHERE companyid = @CompanyId;
+
+    DELETE FROM CrewListedUsers
+    WHERE crewid IN (SELECT id FROM crews WHERE companyid = @CompanyId);
+
+    DELETE FROM crewusers
+    WHERE crewid IN (SELECT id FROM crews WHERE companyid = @CompanyId);
+
+    DELETE FROM crews WHERE companyid = @CompanyId;
+
+    --DELETE FROM LicensePoolHistory WHERE subscriptionid IN (SELECT SubscriptionId FROM CompanySubscriptions WHERE companyid = @CompanyId);
+
+    DELETE FROM LicensePools
+    WHERE subscriptionid IN (SELECT SubscriptionId FROM CompanySubscriptions WHERE companyid = @CompanyId);
+
+    DELETE FROM CompanySubscriptions WHERE companyid = @CompanyId;
+
+    --DELETE FROM LicenseUsagesHistory WHERE companyid = @CompanyId;
+
+    DELETE FROM LicenseUsages WHERE companyid = @CompanyId;
+
+
+    DELETE FROM RimSpecifications WHERE companyid = @CompanyId;
+
+    DELETE FROM rolepermissions
+    WHERE roleid IN (SELECT Id FROM roles WHERE companyid = @CompanyId);
+
+    DELETE FROM safetytaskresponses
+    WHERE safetyobservationid IN (SELECT Id FROM safetyobservations WHERE companyid = @CompanyId);
+
+    DELETE FROM safetyobservationchecklists
+    WHERE safetyobservationid IN (SELECT Id FROM safetyobservations WHERE companyid = @CompanyId);
+
+    DELETE FROM SafetyObservationReviews
+    WHERE safetyobservationid IN (SELECT Id FROM safetyobservations WHERE companyid = @CompanyId);
+
+    DELETE FROM ObservedPersons
+    WHERE safetyobservationid IN (SELECT Id FROM safetyobservations WHERE companyid = @CompanyId);
+
+    DELETE FROM safetyobservations WHERE companyid = @CompanyId;
+
+    DELETE FROM ListedUsers WHERE companyid = @CompanyId;
+
+    DELETE FROM scheduledtasks WHERE companyid = @CompanyId;
+
+    --DELETE FROM SubscriptionAddonsHistory WHERE subscriptionid IN (SELECT Id FROM Subscriptions WHERE companyid = @CompanyId);
+
+    --DELETE FROM SubscriptionChangeRequestHistory WHERE subscriptionid IN (SELECT Id FROM Subscriptions WHERE companyid = @CompanyId);
+
+    DELETE FROM SubscriptionChangeRequests
+    WHERE subscriptionid IN (SELECT Id FROM Subscriptions WHERE companyid = @CompanyId);
+
+    --DELETE FROM SubscriptionFeaturesHistory WHERE subscriptionid IN (SELECT Id FROM Subscriptions WHERE companyid = @CompanyId);
+
+    DELETE FROM SubscriptionFeatures
+    WHERE subscriptionid IN (SELECT Id FROM Subscriptions WHERE companyid = @CompanyId);
+
+    DELETE FROM SubscriptionAddons
+    WHERE subscriptionid IN (SELECT Id FROM Subscriptions WHERE companyid = @CompanyId);
+
+    --DELETE FROM SubscriptionsHistory WHERE companyid = @CompanyId;
+
+    DELETE FROM Subscriptions WHERE companyid = @CompanyId;
+
+    DELETE FROM tyrespecificationclassifications
+    WHERE tyrespecificationid IN (SELECT id FROM TyreSpecifications WHERE companyid = @CompanyId);
+
+    DELETE FROM TyreSpecifications WHERE companyid = @CompanyId;
+
+    DELETE FROM userroles
+    WHERE userid IN (SELECT id FROM users WHERE companyid = @CompanyId);
+
+    DELETE FROM UserScopedCompanys WHERE companyid = @CompanyId;
+
+    DELETE FROM UserScopedSites WHERE companyid = @CompanyId;
+
+    DELETE FROM scopeduserroles
+    WHERE scopeduserid IN (SELECT id FROM scopedusers WHERE userId IN (SELECT id FROM users WHERE companyid = @CompanyId));
+
+	--DECLARE @CompanyId UNIQUEIDENTIFIER = '8496071F-AE46-499F-88D8-EF1A6C45C22D';
+    DELETE FROM scopedusers WHERE userId IN (SELECT id FROM users WHERE companyid = @CompanyId);
+
+    DELETE FROM users WHERE companyid = @CompanyId;
+
+    DELETE FROM roles WHERE companyid = @CompanyId;
+
+    DELETE FROM locations
+    WHERE siteid IN (
+        SELECT id FROM sites
+        WHERE regionid IN (SELECT Id FROM Regions WHERE CompanyId = @CompanyId)
+    );
+
+    DELETE FROM locations
+    WHERE siteid IN (
+        SELECT id FROM sites
+        WHERE subregionid IN (
+            SELECT id FROM SubRegions WHERE regionid IN (SELECT Id FROM Regions WHERE CompanyId = @CompanyId)
+        )
+    );
+
+    DELETE FROM sites WHERE regionid IN (SELECT Id FROM Regions WHERE CompanyId = @CompanyId);
+
+    DELETE FROM sites
+    WHERE subregionid IN (
+        SELECT id FROM SubRegions WHERE regionid IN (SELECT Id FROM Regions WHERE CompanyId = @CompanyId)
+    );
+
+    DELETE FROM SubRegions WHERE regionid IN (SELECT Id FROM Regions WHERE CompanyId = @CompanyId);
+
+    DELETE FROM Regions WHERE CompanyId = @CompanyId;
+
+    DELETE FROM VehicleSpecificationRecommendedRims
+    WHERE VehicleSpecificationId IN (SELECT Id FROM VehicleSpecifications WHERE companyId = @CompanyId);
+
+    DELETE FROM VehicleSpecificationRecommendedTyres
+    WHERE VehicleSpecificationId IN (SELECT Id FROM VehicleSpecifications WHERE companyId = @CompanyId);
+
+    DELETE FROM VehicleSpecifications WHERE companyId = @CompanyId;
+
+    DELETE FROM tenants WHERE id IN (SELECT tenantid FROM Companys WHERE id = @CompanyId);
+
+    DELETE FROM Companys WHERE id = @CompanyId;
+
+    -- Decide whether to commit or rollback based on parameter
+    IF @CommitTransaction = 1
+    BEGIN
+        -- Only commit if transaction is active
+        IF XACT_STATE() = 1
+            COMMIT TRANSACTION;
+        ELSE
+            THROW 50001, 'Transaction is not in a committable state.', 1;
+    END
+    ELSE
+    BEGIN
+        IF XACT_STATE() <> 0
+            ROLLBACK TRANSACTION;
+        -- If rollback requested, we can return a specific code/message if desired
+    END
+
+    -- Return a simple status
+    IF @CommitTransaction = 1
+        SELECT 1 AS CompletedWithCommit;
+    ELSE
+        SELECT 0 AS RolledBackByParameter;
+
+END TRY
+BEGIN CATCH
+    -- If an error occurs, ensure transaction is rolled back and rethrow the error
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    DECLARE @ErrMsg NVARCHAR(4000) = ERROR_MESSAGE();
+    DECLARE @ErrSev INT = ERROR_SEVERITY();
+    DECLARE @ErrState INT = ERROR_STATE();
+
+    -- Rethrow original error
+    THROW;
+END CATCH
