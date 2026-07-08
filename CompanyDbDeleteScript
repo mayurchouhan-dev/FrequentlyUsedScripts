@@ -1,0 +1,379 @@
+-- Created by GitHub Copilot in SSMS - review carefully before executing
+
+
+
+-- STEP 1: Define the list of CompanyIds to delete
+DECLARE @CompaniesToDelete TABLE (
+    CompanyId UNIQUEIDENTIFIER,
+    ProcessStatus NVARCHAR(50) DEFAULT 'Pending',
+    ErrorMessage NVARCHAR(MAX) NULL
+);
+
+-- STEP 2: Insert CompanyIds you want to delete
+INSERT INTO @CompaniesToDelete (CompanyId)
+VALUES 
+    ('C97FE366-6B42-4A52-9D78-80936E753717');
+
+DECLARE @ApplyChanges BIT = 1;  -- 1 = commit changes, 0 = dry-run (rollback)
+
+-- STEP 3: Process each company
+DECLARE @CurrentCompanyId UNIQUEIDENTIFIER;
+DECLARE @RowsAffected INT;
+
+DECLARE CompanyCursor CURSOR LOCAL FAST_FORWARD FOR
+    SELECT CompanyId FROM @CompaniesToDelete;
+
+OPEN CompanyCursor;
+FETCH NEXT FROM CompanyCursor INTO @CurrentCompanyId;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    PRINT '';
+    PRINT '========================================';
+    PRINT 'Processing Company: ' + CONVERT(NVARCHAR(36), @CurrentCompanyId);
+    PRINT '========================================';
+    
+    BEGIN TRANSACTION;
+    
+    BEGIN TRY
+        -- Delete action users for inspections
+        DELETE FROM dbo.actionusers
+        WHERE actionid IN (
+            SELECT id FROM dbo.Inspections WHERE tenantId = @CurrentCompanyId
+        );
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from actionusers';
+
+        -- Inspection tyre-position specific data and related damages
+        DELETE d
+        FROM dbo.damages d
+        WHERE d.typeid IN (
+            SELECT id FROM dbo.InspectionTyrePositionSpecificDatas
+            WHERE InspectionId IN (SELECT Id FROM dbo.Inspections WHERE tenantid = @CurrentCompanyId)
+        );
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from damages (InspectionTyrePosition)';
+
+        DELETE FROM dbo.InspectionTyrePositionSpecificDatas
+        WHERE InspectionId IN (SELECT Id FROM dbo.Inspections WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from InspectionTyrePositionSpecificDatas';
+
+        -- Cracktests tied to tenant
+        DELETE FROM dbo.cracktests WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from cracktests';
+
+        -- Damages tied to tyre repairs
+        DELETE d
+        FROM dbo.damages d
+        WHERE d.typeid IN (
+            SELECT id FROM dbo.tyrerepairs
+            WHERE tyreassetid IN (SELECT id FROM dbo.tyreassets WHERE tenantid = @CurrentCompanyId)
+        );
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from damages (TyreRepairs)';
+
+        -- Tyrerepairs for tyreassets
+        DELETE FROM dbo.tyrerepairs
+        WHERE tyreassetid IN (SELECT id FROM dbo.tyreassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from tyrerepairs';
+
+        -- Tyre asset related history
+        DELETE FROM dbo.assethourhistorys
+        WHERE assetid IN (SELECT id FROM dbo.TyreAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assethourhistorys (TyreAssets)';
+
+        DELETE FROM dbo.assetmovementhistorys
+        WHERE assetid IN (SELECT id FROM dbo.TyreAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetmovementhistorys (TyreAssets)';
+
+        DELETE FROM dbo.assetsdispositionhistories
+        WHERE assetId IN (SELECT id FROM dbo.TyreAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsdispositionhistories (TyreAssets)';
+
+        DELETE FROM dbo.scrapAssets
+        WHERE assetid IN (SELECT id FROM dbo.TyreAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from scrapAssets (TyreAssets)';
+
+        -- TreadDepths
+        DELETE FROM dbo.TreadDepths WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from TreadDepths';
+
+        -- tyreassets table
+        DELETE FROM dbo.TyreAssets WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from TyreAssets';
+
+        -- Vehicle-related deletes
+        DELETE FROM dbo.vehiclepositionmanagements
+        WHERE vehicleid IN (SELECT id FROM dbo.vehicleassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from vehiclepositionmanagements';
+
+        DELETE FROM dbo.vehiclehourmeters
+        WHERE vehicleassetid IN (SELECT id FROM dbo.vehicleassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from vehiclehourmeters';
+
+        DELETE FROM dbo.vehicleodometerhistory
+        WHERE vehicleid IN (SELECT id FROM dbo.vehicleassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from vehicleodometerhistory';
+
+        DELETE FROM dbo.assethourhistorys
+        WHERE assetid IN (SELECT id FROM dbo.vehicleassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assethourhistorys (VehicleAssets)';
+
+        DELETE FROM dbo.assetmovementhistorys
+        WHERE assetid IN (SELECT id FROM dbo.vehicleassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetmovementhistorys (VehicleAssets)';
+
+        DELETE FROM dbo.assetretorques
+        WHERE vehicleassetid IN (SELECT id FROM dbo.vehicleassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetretorques';
+
+        DELETE FROM dbo.assetsdispositionhistories
+        WHERE assetId IN (SELECT id FROM dbo.vehicleassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsdispositionhistories (VehicleAssets)';
+
+        DELETE FROM dbo.scrapAssets
+        WHERE assetid IN (SELECT id FROM dbo.vehicleassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from scrapAssets (VehicleAssets)';
+
+        -- AdapterPlateAssets group
+        DELETE FROM dbo.assethourhistorys
+        WHERE assetid IN (SELECT id FROM dbo.AdapterPlateAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assethourhistorys (AdapterPlateAssets)';
+
+        DELETE FROM dbo.assetmovementhistorys
+        WHERE assetid IN (SELECT id FROM dbo.AdapterPlateAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetmovementhistorys (AdapterPlateAssets)';
+
+        DELETE FROM dbo.assetsdispositionhistories
+        WHERE assetId IN (SELECT id FROM dbo.AdapterPlateAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsdispositionhistories (AdapterPlateAssets)';
+
+        DELETE FROM dbo.scrapAssets
+        WHERE assetid IN (SELECT id FROM dbo.AdapterPlateAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from scrapAssets (AdapterPlateAssets)';
+
+        DELETE FROM dbo.AdapterPlateAssets WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from AdapterPlateAssets';
+
+        -- Chainassets group
+        DELETE FROM dbo.assethourhistorys
+        WHERE assetid IN (SELECT id FROM dbo.Chainassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assethourhistorys (Chainassets)';
+
+        DELETE FROM dbo.assetmovementhistorys
+        WHERE assetid IN (SELECT id FROM dbo.Chainassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetmovementhistorys (Chainassets)';
+
+        DELETE FROM dbo.assetsdispositionhistories
+        WHERE assetId IN (SELECT id FROM dbo.Chainassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsdispositionhistories (Chainassets)';
+
+        DELETE FROM dbo.scrapAssets
+        WHERE assetid IN (SELECT id FROM dbo.Chainassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from scrapAssets (Chainassets)';
+
+        DELETE FROM dbo.Chainassets WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from Chainassets';
+
+        -- Rimassets group
+        DELETE FROM dbo.assethourhistorys
+        WHERE assetid IN (SELECT id FROM dbo.Rimassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assethourhistorys (Rimassets)';
+
+        DELETE FROM dbo.assetmovementhistorys
+        WHERE assetid IN (SELECT id FROM dbo.Rimassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetmovementhistorys (Rimassets)';
+
+        DELETE FROM dbo.assetsdispositionhistories
+        WHERE assetId IN (SELECT id FROM dbo.Rimassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsdispositionhistories (Rimassets)';
+
+        DELETE FROM dbo.scrapAssets
+        WHERE assetid IN (SELECT id FROM dbo.Rimassets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from scrapAssets (Rimassets)';
+
+        DELETE FROM dbo.Rimassets WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from Rimassets';
+
+        -- TPMS Sensor assets group
+        DELETE FROM dbo.assethourhistorys
+        WHERE assetid IN (SELECT id FROM dbo.TpmsSensorAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assethourhistorys (TpmsSensorAssets)';
+
+        DELETE FROM dbo.assetmovementhistorys
+        WHERE assetid IN (SELECT id FROM dbo.TpmsSensorAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetmovementhistorys (TpmsSensorAssets)';
+
+        DELETE FROM dbo.assetsdispositionhistories
+        WHERE assetId IN (SELECT id FROM dbo.TpmsSensorAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsdispositionhistories (TpmsSensorAssets)';
+
+        DELETE FROM dbo.scrapAssets
+        WHERE assetid IN (SELECT id FROM dbo.TpmsSensorAssets WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from scrapAssets (TpmsSensorAssets)';
+
+        DELETE FROM dbo.TpmsSensorAssets WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from TpmsSensorAssets';
+
+        -- Stocktakes and related
+        DELETE FROM dbo.stocktakeassets
+        WHERE stocktakeid IN (SELECT id FROM dbo.stocktakes WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from stocktakeassets';
+
+        DELETE FROM dbo.stocktakedispositions
+        WHERE stocktakeid IN (SELECT id FROM dbo.stocktakes WHERE tenantid = @CurrentCompanyId);
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from stocktakedispositions';
+
+        DELETE FROM dbo.stocktakes WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from stocktakes';
+
+        -- Assets fitments
+        DELETE FROM dbo.assetsfitmentsizes WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsfitmentsizes';
+
+        DELETE FROM dbo.assetsvehiclefitments WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsvehiclefitments';
+
+        -- Dispatch and dispositions
+        DELETE FROM dbo.DispatchAssets WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from DispatchAssets';
+
+        DELETE FROM dbo.dispositions WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from dispositions';
+
+        -- Inspections
+        DELETE FROM dbo.Inspections WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from Inspections';
+
+        -- Pressure checks
+        DELETE FROM dbo.pressurecheckreadings WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from pressurecheckreadings';
+
+        -- Vehicle assets
+        DELETE FROM dbo.vehicleassets WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from vehicleassets';
+
+        -- Fleets
+        DELETE FROM dbo.fleets WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from fleets';
+
+        -- Properties and settings
+        DELETE FROM dbo.propertyoptions WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from propertyoptions';
+
+        DELETE FROM dbo.companysettings WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from companysettings';
+
+        DELETE FROM dbo.properties WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from properties';
+
+        DELETE FROM dbo.propertygroups WHERE tenantid = @CurrentCompanyId;
+        SET @RowsAffected = @@ROWCOUNT;
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from propertygroups';
+
+        -- Commit or rollback based on @ApplyChanges
+        IF @ApplyChanges = 1
+        BEGIN
+            COMMIT TRANSACTION;
+            PRINT 'SUCCESS: Transaction committed for Company ' + CONVERT(NVARCHAR(36), @CurrentCompanyId);
+            
+            UPDATE @CompaniesToDelete
+            SET ProcessStatus = 'Success'
+            WHERE CompanyId = @CurrentCompanyId;
+        END
+        ELSE
+        BEGIN
+            ROLLBACK TRANSACTION;
+            PRINT 'DRY-RUN: Transaction rolled back for Company ' + CONVERT(NVARCHAR(36), @CurrentCompanyId);
+            
+            UPDATE @CompaniesToDelete
+            SET ProcessStatus = 'Dry-Run Completed'
+            WHERE CompanyId = @CurrentCompanyId;
+        END
+
+    END TRY
+    BEGIN CATCH
+        IF XACT_STATE() <> 0
+            ROLLBACK TRANSACTION;
+
+        DECLARE @ErrorMsg NVARCHAR(MAX) = ERROR_MESSAGE();
+        
+        PRINT 'ERROR processing Company ' + CONVERT(NVARCHAR(36), @CurrentCompanyId) + ': ' + @ErrorMsg;
+        
+        UPDATE @CompaniesToDelete
+        SET ProcessStatus = 'Failed',
+            ErrorMessage = @ErrorMsg
+        WHERE CompanyId = @CurrentCompanyId;
+
+        -- Continue to next company instead of throwing
+    END CATCH
+
+    FETCH NEXT FROM CompanyCursor INTO @CurrentCompanyId;
+END
+
+CLOSE CompanyCursor;
+DEALLOCATE CompanyCursor;
+
+-- STEP 4: Display summary
+PRINT '';
+PRINT '========================================';
+PRINT 'SUMMARY OF DELETIONS';
+PRINT '========================================';
+
+SELECT 
+    CompanyId,
+    ProcessStatus,
+    ErrorMessage
+FROM @CompaniesToDelete
+ORDER BY ProcessStatus, CompanyId;
