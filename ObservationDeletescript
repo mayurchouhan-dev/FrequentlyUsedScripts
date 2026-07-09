@@ -53,6 +53,7 @@ select * from scopeduserroles
 
 		delete  from ScopedUserRoles where scopeduserid in  (select id from ScopedUsers where companyid = @CompanyId)
 
+--need to update-- only scoped user site should be deleted
 		delete  from UserScopedSites  where companyid = @CompanyId
 
 
