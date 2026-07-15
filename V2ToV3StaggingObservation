@@ -1,0 +1,1112 @@
+source(output(
+		Uid as integer,
+		CompanyId as integer,
+		SiteId as integer,
+		LocationId as integer,
+		ObservationNumber as string,
+		Fitteroperator as integer,
+		Fitteroffsider as integer,
+		ConductedBy as string,
+		Shift as string,
+		ObservationStatus as integer,
+		CommentByObserver as string,
+		AdditionalComment as string,
+		ManagerReviewComment as string,
+		SignatureObserver as string,
+		ObserverSignaturDate as timestamp,
+		ManagementReview as string,
+		SignatureManagerDate as timestamp,
+		Date as timestamp,
+		other_operator as string,
+		other_offsider as string,
+		reviewer_id as integer,
+		deviceId as string,
+		createdDate as timestamp,
+		updatedDate as timestamp,
+		CreatedBy as integer,
+		UpdatedBy as integer,
+		IsDeleted as boolean
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> V2ObservationDetailSource
+source(output(
+		Id as string,
+		Name as string,
+		TypeCode as string,
+		TenantId as string,
+		ParentCompanyId as string,
+		ExternalCompanyId as string,
+		ContactPerson as string,
+		PhoneNumber as string,
+		CountryId as string,
+		StateId as string,
+		CityName as string,
+		Address1 as string,
+		Address2 as string,
+		ZipCode as string,
+		StatusCode as string,
+		ScrapAverageTarget as float,
+		FrontFitmentThreshold as float,
+		PercentageOfUsableTread as float,
+		RotationPolicyTreadUtilization as float,
+		RotationPolicyHours as float,
+		ProductionHours as integer,
+		ObservationThreshold as integer,
+		CrackTestFrequency as integer,
+		DefaultTimeZone as string,
+		DefaultLanguage as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		IsDeleted as boolean,
+		DisableResellerAccess as boolean,
+		OldCompanyId as integer
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> V3StaggingCompanySource
+source(output(
+		Id as string,
+		Name as string,
+		Description as string,
+		Address1 as string,
+		Address2 as string,
+		SubRegionId as string,
+		RegionId as string,
+		StatusCode as string,
+		ScrapAverageTarget as float,
+		FrontFitmentThreshold as float,
+		PercentageOfUsableTread as float,
+		RotationPolicyTreadUtilization as float,
+		RotationPolicyHours as float,
+		ObservationThreshold as string,
+		CrackTestFrequency as string,
+		DefaultTimeZone as string,
+		DefaultLanguage as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		CityName as string,
+		Email as string,
+		PostCode as string,
+		InheritSettings as boolean,
+		ContactId as string,
+		CountryId as string,
+		StateId as string,
+		CityId as string,
+		DisableSite as boolean,
+		IsDeleted as boolean,
+		OldSiteId as integer
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> V3StaggingSiteSource
+source(output(
+		Id as string,
+		AzureADId as string,
+		DisplayName as string,
+		FirstName as string,
+		LastName as string,
+		Email as string,
+		Password as string,
+		PhoneNumber as string,
+		CompanyId as string,
+		SiteId as string,
+		LocationId as string,
+		StatusCode as integer,
+		ChangedPassword as boolean,
+		ProfileImageUrl as string,
+		TypeCode as string,
+		HasCompletedTour as boolean,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		IsDeleted as boolean,
+		IsLoggedIn as boolean,
+		SignedInOnUtc as timestamp,
+		Description as string,
+		CanDelete as boolean,
+		IsAgreementAccepted as boolean,
+		IsMobileAgreementAccepted as boolean,
+		OldUserId as integer
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> V3StaggingUserSource
+source(output(
+		Uid as integer,
+		ObservationId as integer,
+		isDocumentImage as boolean,
+		ImageName as string
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> V2ObservationImage
+source(output(
+		Id as string,
+		FirstName as string,
+		LastName as string,
+		DisplayName as string,
+		PhoneNumber as string,
+		CompanyId as string,
+		SiteId as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		IsDeleted as boolean
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> V3StaggingListedUser
+source(output(
+		InCorrect as string,
+		Correct as string
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> OtherOperatorOffsiderCorrectionSource
+source(output(
+		Id as string,
+		AzureADId as string,
+		DisplayName as string,
+		FirstName as string,
+		LastName as string,
+		Email as string,
+		Password as string,
+		PhoneNumber as string,
+		CompanyId as string,
+		SiteId as string,
+		LocationId as string,
+		StatusCode as integer,
+		ChangedPassword as boolean,
+		ProfileImageUrl as string,
+		TypeCode as string,
+		HasCompletedTour as boolean,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		IsDeleted as boolean,
+		IsLoggedIn as boolean,
+		SignedInOnUtc as timestamp,
+		Description as string,
+		CanDelete as boolean,
+		IsAgreementAccepted as boolean,
+		IsMobileAgreementAccepted as boolean,
+		OldUserId as integer
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> MarathonUserAsScoped
+source(output(
+		Id as string,
+		UserId as string,
+		CompanyId as string,
+		StartDate as timestamp,
+		EndDate as timestamp,
+		StatusCode as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		SiteId as string,
+		CanDelete as boolean
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> ExistingScopedUsers
+source(output(
+		Id as string,
+		Name as string,
+		Level as integer,
+		StatusCode as string,
+		CompanyId as string,
+		TypeCode as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		Description as string
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> V3DevRoles
+source(output(
+		Id as string,
+		Name as string,
+		Description as string,
+		StatusCode as string,
+		CompanyId as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		InheritSettings as boolean,
+		CountryId as string,
+		IsDeleted as boolean,
+		OldRegionId as integer
+	),
+	allowSchemaDrift: true,
+	validateSchema: false,
+	isolationLevel: 'READ_UNCOMMITTED',
+	format: 'table') ~> V3RegionSource
+joinObservationAndDefaultUser derive(NewSafetyObservationId = uuid(),
+		ObservationTime = toString(createdDate, 'HH:mm:ss'),
+		IsApproved = iif(ObservationStatus == 1 && reviewer_id > 0, true(), false()),
+		IsReviewed = iif((ObservationStatus == 2 || ObservationStatus == 1) && reviewer_id > 0, true(), false()),
+		CreatedBy = DefaultNewUserId,
+		SignatureDocumentId = uuid(),
+		SignatureDocumentName = at(split(SignatureObserver, '/'), size(split(SignatureObserver, '/'))),
+		ObservationType = 1,
+		ConductedByType = 'USER',
+		ObservationShift = iif(instr(lower(Shift), 'night') > 0, 'Night', 'Day'),
+		DerivedIsDeleted = iif(isNull(IsDeleted), 0, 1),
+		CreatedOnUtc = createdDate,
+		ConductedByInt = toInteger(ConductedBy),
+		Other_offsiderInComment = iif(other_offsider == '' || isNull(other_offsider), '', 'Other Offsider: '+ other_offsider + iif(other_operator == '' || isNull(other_operator), '.', ', ')),
+		Other_operatorInComment = iif(other_operator == '' || isNull(other_operator), '', 'Other Operator: '+ other_operator + '.')) ~> derivedColumnSafetyObservation
+V3StaggingCompanySource select(mapColumn(
+		NewCompanyId = Id,
+		OldCompanyId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectCompany
+filterDeleted, selectCompany join(CompanyId == OldCompanyId,
+	joinType:'inner',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinObservationAndCompany
+V3StaggingSiteSource select(mapColumn(
+		NewSiteId = Id,
+		OldSiteId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectSite
+joinObservationAndCompany, selectSite join(SiteId == OldSiteId,
+	joinType:'inner',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinObservationAndSite
+V3StaggingUserSource select(mapColumn(
+		ModifiedByNewUserId = Id,
+		ModifiedByOldUserId = OldUserId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectModifiedByUser
+joinObservationAndSite, selectModifiedByUser join(UpdatedBy == ModifiedByOldUserId,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinObservationAndModifiedBy
+V3StaggingUserSource select(mapColumn(
+		ConductedByNewUserId = Id,
+		ConductedByOldUserId = OldUserId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectConductedByUser
+derivedColumnSafetyObservation derive(SignatureDocumentPath = 'https://mtv3storage.blob.core.windows.net/tmass-documents/migration/'+iif(trim(SignatureDocumentName) != '', SignatureDocumentName, 'MigratedNoSignature.png'),
+		SignatureDocumentName = iif(SignatureDocumentName == '' || isNull(SignatureDocumentName), 'MigratedNoSignature' , SignatureDocumentName),
+		LevelTypeCode = 'OBSERVATIONSIGNATURE',
+		DocTypeCode = 'image/png',
+		Size = 100) ~> derivedDocumentColumns
+V3StaggingUserSource select(mapColumn(
+		DefaultNewUserId = Id,
+		DefaultUserCompanyId = CompanyId,
+		DefaultOldUserId = OldUserId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectDefaultUser
+selectDefaultUser window(over(DefaultUserCompanyId),
+	asc(DefaultOldUserId, true),
+	RowNumber = rowNumber()) ~> defaultUserWindow
+defaultUserWindow filter(RowNumber == 1) ~> DefaultUserFilter
+joinObservationAndModifiedBy, DefaultUserFilter join(NewCompanyId == DefaultUserCompanyId,
+	joinType:'inner',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinObservationAndDefaultUser
+derivedColumnSafetyObservation split(Fitteroffsider > 0,
+	Fitteroperator > 0,
+	!isNull(other_offsider),
+	!isNull(other_operator),
+	disjoint: true) ~> split1@(ObservedPersonOffsider, ObservedPersonOperator, ObservedPersonOtherOffsider, ObservedPersonOtherOperator)
+filterFitterOffsider derive(NewObservedPersonId = uuid(),
+		PersonType = 'Offsider',
+		IsUser = 1,
+		IsCrewMember = 0,
+		IsListedUser = 0,
+		IsScopedUser = 0) ~> derivedOffsider
+V3StaggingUserSource select(mapColumn(
+		OperatorObservedPersonNewUserId = Id,
+		OperatorObservedPersonOldUserId = OldUserId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectOperatorObservedPerson
+filterFitterOperator derive(NewObservedPersonId = uuid(),
+		PersonType = 'Operator',
+		IsUser = 1,
+		IsCrewMember = 0,
+		IsListedUser = 0,
+		IsScopedUser = 0) ~> DerivedOperator
+filterReviewer derive(SafetyObservationReviewNewId = uuid(),
+		ReviewByType = 'USER',
+		NewManagementReviewDocumentId = uuid(),
+		ManagementReviewDocumentName = at(split(ManagementReview, '/'), size(split(ManagementReview, '/')))) ~> derivedObservationReview
+V3StaggingUserSource select(mapColumn(
+		ManagementReviewNewUserId = Id,
+		ManagementReviewOldUserId = OldUserId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectManagementReviewUser
+derivedObservationReview derive(ManagementReviewLevelTypeCode = 'OBSERVATIONREVIEWER',
+		ManagementReviewDocumentTypeCode = 'image/png',
+		ManagementReviewDocumentSize = 100,
+		ManagementReviewDocumentPath = 'https://mtv3storage.blob.core.windows.net/tmass-documents/migration/'+ManagementReviewDocumentName) ~> derivedManagementReviewDocument
+derivedColumnSafetyObservation filter(iif((ObservationStatus == 2 || ObservationStatus == 1) && reviewer_id > 0, true(), false())) ~> filterReviewer
+split1@ObservedPersonOffsider filter(Fitteroffsider > 0) ~> filterFitterOffsider
+split1@ObservedPersonOperator filter(Fitteroperator > 0) ~> filterFitterOperator
+derivedObservationReview, selectManagementReviewUser join(reviewer_id == ManagementReviewOldUserId,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinReviewedUserAndObservation
+DerivedOperator, selectMarathonUserAsScoped join(Fitteroperator == ConductedByOldUserId,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinOperatorAndObservation
+V3StaggingUserSource select(mapColumn(
+		OffsiderObservedPersonNewUserId = Id,
+		OffsiderObservedPersonOldUserId = OldUserId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectOffsiderObservedPerson
+derivedOffsider, selectMarathonUserAsScoped join(Fitteroffsider == ConductedByOldUserId,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinOffsiderAndObservation
+joinConductedByAndObservationDetail derive(ConductedBy = iif(isNull(ConductedByNewUserId), DefaultNewUserId, ConductedByNewUserId),
+		MigrationComment = iif(Other_offsiderInComment + Other_operatorInComment == '', '', 'Migration: ' + Other_offsiderInComment + Other_operatorInComment)) ~> derivedColumn1
+V2ObservationImage filter(isDocumentImage == true()) ~> filterObserverationImage
+filterObserverationImage select(mapColumn(
+		ObserverationImageObservationId = ObservationId,
+		isDocumentImage,
+		ObserverationImageImageName = ImageName
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectObserverationImage
+derivedColumnSafetyObservation, selectObserverationImage join(Uid == ObserverationImageObservationId,
+	joinType:'inner',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> join1
+join1 derive(ObserverationImageDocumentPath = 'https://mtv3storage.blob.core.windows.net/tmass-documents/migration/' + at(split(ObserverationImageImageName, '/'), size(split(ObserverationImageImageName, '/'))),
+		ObservationImageDocumentId = uuid(),
+		ObservationImageDocumentName = at(split(ObserverationImageImageName, '/'), size(split(ObserverationImageImageName, '/'))),
+		LevelTypeCode = 'OBSERVATION',
+		DocTypeCode = 'image/png',
+		Size = 100) ~> derivedObserverImage
+derivedColumn1 derive(AdditionalComment = iif(AdditionalComment == '' || isNull(AdditionalComment) ,'', AdditionalComment)) ~> derivedColumn2
+split1@ObservedPersonOtherOffsider filter(!isNull(other_offsider) && Fitteroffsider == 0) ~> filterOtherOffsider
+flattenOtherOffsider derive(PersonType = 'Offsider',
+		IsUser = 0,
+		IsCrewMember = 0,
+		IsListedUser = 1,
+		IsScopedUser = 0,
+		other_offsider = SplitOtherOffsiderNames) ~> derivedOtherOffsider
+V3StaggingListedUser select(mapColumn(
+		NewListedUserId = Id,
+		LisetedUserDisplayName = DisplayName,
+		ListedUserCompanyId = CompanyId,
+		LisetedUserSiteId = SiteId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectListedUser
+derivedOtherOffsider, selectListedUser join(trim(lower(other_offsider)) == lower(LisetedUserDisplayName),
+	joinType:'inner',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinOtherOffsiderAndListedUser
+split1@ObservedPersonOtherOperator filter(!isNull(other_operator) && Fitteroperator == 0) ~> filterOtherOperator
+flattenOtherOperator derive(PersonType = 'operator',
+		IsUser = 0,
+		IsListedUser = 1,
+		IsCrewMember = 0,
+		IsScopedUser = 0,
+		other_operator = SplitOtherOperatorNames) ~> DerivedOtherOperator
+filter1, selectListedUser join(trim(lower(other_operator)) == lower(LisetedUserDisplayName),
+	joinType:'inner',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinOtherOperatorAndListedUser
+V2ObservationDetailSource filter((isNull(IsDeleted) || IsDeleted == false())) ~> filterDeleted
+joinOtherOperatorMarathonLookup split(isNull(OtherOperatorUserId) && isNull(OtherOperatorScopedUserId),
+	disjoint: false) ~> split2@(OtherOperatorListedUser, OtherOperatorUser)
+filter2 derive(other_operator = case(
+    lower(other_operator) == lower('Mick Bragg'), 'Michael Bragg', 
+    lower(other_operator) == lower('Adam Mathewâ€™s'), 'Adam Mathews',
+    other_operator
+),
+		IsUser = iif(!isNull(OtherOperatorUserId), 1, 0),
+		IsListedUser = 0,
+		IsScopedUser = iif(isNull(OtherOperatorUserId) && !isNull(OtherOperatorScopedUserId), 1, 0),
+		ScopedUserId = OtherOperatorScopedUserId) ~> UserName
+V3StaggingUserSource select(mapColumn(
+		OtherOperatorUserId = Id,
+		DisplayName
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> SelectOtherOperatorUser
+derivedOperatorCorrected derive(SplitOtherOperatorNames = split(
+    regexReplace(
+	   other_operator,
+	   '\\s*(\\band\\b|&|/)\\s*',
+	   ','
+    ),
+    ','
+)) ~> SplitOtherOperatorNames
+SplitOtherOperatorNames foldDown(unroll(SplitOtherOperatorNames),
+	mapColumn(
+		each(match(/* All input columns */true()),
+			/* Input name */$$ = $$)
+	),
+	skipDuplicateMapInputs: false,
+	skipDuplicateMapOutputs: false) ~> flattenOtherOperator
+derivedOffsiderCorrected derive(SplitOtherOffsiderNames = split(
+    regexReplace(
+	   other_offsider,
+	   '\\s*(\\band\\b|&|/)\\s*',
+	   ','
+    ),
+    ','
+)) ~> SplitOtherOffsiderNames
+SplitOtherOffsiderNames foldDown(unroll(SplitOtherOffsiderNames),
+	mapColumn(
+		each(match(/* All input columns */true()),
+			/* Input name */$$ = $$)
+	),
+	skipDuplicateMapInputs: false,
+	skipDuplicateMapOutputs: false) ~> flattenOtherOffsider
+filterOtherOffsider, OtherOperatorOffsiderCorrectionSource join(trim(regexReplace(lower(other_offsider), '\\s+', ' ')) == trim(regexReplace(lower(InCorrect), '\\s+', ' ')),
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinOffsiderCorrection
+joinOffsiderCorrection derive(other_offsider = iif(isNull(Correct), other_offsider, Correct)) ~> derivedOffsiderCorrected
+filterOtherOperator, OtherOperatorOffsiderCorrectionSource join(trim(regexReplace(lower(other_operator), '\\s+', ' ')) == trim(regexReplace(lower(InCorrect), '\\s+', ' ')),
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinOperatorCorrection
+joinOperatorCorrection derive(other_operator = iif(isNull(Correct), other_operator, Correct)) ~> derivedOperatorCorrected
+DerivedOtherOperator, filterDedupOperatorUser join(trim(lower(other_operator)) == trim(lower(DisplayName)),
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'right')~> joinOtherOperatorUserLookup
+split2@OtherOperatorListedUser filter(isNull(OtherOperatorUserId) && isNull(OtherOperatorScopedUserId)) ~> filter1
+split2@OtherOperatorUser filter(!isNull(OtherOperatorUserId) || !isNull(OtherOperatorScopedUserId)) ~> filter2
+SelectOtherOperatorUser window(over(DisplayNameKey = lower(trim(DisplayName))),
+	asc(OtherOperatorUserId, true),
+	RowNum = rowNumber()) ~> windowDedupOperatorUser
+windowDedupOperatorUser filter(RowNum == 1) ~> filterDedupOperatorUser
+joinConductedByAndObservationDetail derive(ScopedUserStatus = 'ACTIVE',
+		UserId = ConductedByNewUserId) ~> ScopeduserStatus
+MarathonUserAsScoped select(mapColumn(
+		ConductedByNewUserId = Id,
+		ConductedByOldUserId = OldUserId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectMarathonUserAsScoped
+derivedColumnSafetyObservation, selectMarathonUserAsScoped join(ConductedByInt == ConductedByOldUserId,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinConductedByAndObservationDetail
+checkUserCompanyExists alterRow(insertIf(true())) ~> alterRow1
+dedupScopedUsers, ExistingScopedUsers exists(dedupScopedUsers@UserId == ExistingScopedUsers@UserId
+	&& NewCompanyId == CompanyId,
+	negate:true,
+	broadcast: 'auto')~> checkUserCompanyExists
+unionAllScopedUserCandidates aggregate(groupBy(ConductedByNewUserId,
+		NewCompanyId),
+	NewSiteId = first(NewSiteId),
+		CreatedBy = first(CreatedBy),
+		createdDate = iif(isNull(min(createdDate)), currentTimestamp(), min(createdDate)),
+		ScopedUserStatus = first(ScopedUserStatus),
+		UserId = first(UserId)) ~> dedupScopedUsers
+joinReviewedUserAndObservation, selectMarathonUserAsScoped join(reviewer_id == ConductedByOldUserId,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> join2
+join2 derive(ManagementReviewNewUserId = iif(
+	  isNull(ManagementReviewNewUserId),
+	  ConductedByNewUserId,
+	  ManagementReviewNewUserId
+   )) ~> resolveReviewerUserId
+resolveReviewerUserId filter(!isNull(ManagementReviewNewUserId)) ~> filterValidReviewer
+alterRow1 derive(CanDelete = true(),
+		StartDate = createdDate,
+		NewScopedid = uuid()) ~> derivedColumn3
+V3DevRoles filter(Name == 'Field Supervisor') ~> filter3
+derivedColumn3, selectRoleFields join(NewCompanyId == RoleCompanyId,
+	joinType:'inner',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinScopedUserRole
+joinScopedUserRole derive(NewScopedUserRoleId = uuid()) ~> derivedScopedUserRole
+filter3 select(mapColumn(
+		RoleId = Id,
+		RoleCompanyId = CompanyId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectRoleFields
+V3StaggingSiteSource select(mapColumn(
+		AllSiteId = Id,
+		AllSiteRegionId = RegionId,
+		AllSiteIsDeleted = IsDeleted
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectAllSiteFields
+selectAllSiteFields, V3RegionSource join(AllSiteRegionId == Id,
+	joinType:'inner',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> RegionSite
+derivedColumn3, RegionSite join(NewCompanyId == CompanyId,
+	joinType:'inner',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> join4
+join4 derive(NewUserScopedSiteId = uuid()) ~> derivedColumn4
+joinOtherOffsiderAndListedUser derive(NewObservedPersonId = uuid()) ~> derivedOtherOffsiderFinal
+joinOtherOperatorAndListedUser derive(NewObservedPersonId = uuid()) ~> derivedOtherOperatorFinal
+joinOffsiderAndObservation filter(!isNull(ConductedByNewUserId)) ~> filter4
+joinOperatorAndObservation filter(!isNull(ConductedByNewUserId)) ~> filter5
+filter4 derive(ScopedUserStatus = 'ACTIVE',
+		UserId = ConductedByNewUserId) ~> OffsiderScopedUserStatus
+filter5 derive(ScopedUserStatus = 'ACTIVE',
+		UserId = ConductedByNewUserId) ~> OperatorScopedUserStatus
+ScopeduserStatus, OffsiderScopedUserStatus, OperatorScopedUserStatus union(byName: true)~> unionAllScopedUserCandidates
+MarathonUserAsScoped select(mapColumn(
+		OtherOperatorScopedUserId = Id,
+		DisplayName
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectMarathonScopedOperatorName
+selectMarathonScopedOperatorName window(over(DisplayNameKey = lower(trim(DisplayName))),
+	asc(OtherOperatorScopedUserId, true),
+	RowNum = rowNumber()) ~> windowDedupMarathonOperator
+windowDedupMarathonOperator filter(RowNum == 1) ~> filterDedupMarathonOperator
+joinOtherOperatorUserLookup, filterDedupMarathonOperator join(trim(lower(other_operator)) == trim(lower(selectMarathonScopedOperatorName@DisplayName)),
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'right')~> joinOtherOperatorMarathonLookup
+derivedColumn2 sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		ObservationDate as timestamp,
+		Shift as string,
+		CompanyId as string,
+		SiteId as string,
+		ConductedById as string,
+		Notes as string,
+		JobDescription as string,
+		AdditionalComment as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		SignatureDocumentId as string,
+		IsApproved as boolean,
+		IsReviewed as boolean,
+		Location as string,
+		ObservationType as integer,
+		ObservationNumber as string,
+		DateSigned as timestamp,
+		IsDeleted as boolean,
+		Flag as string,
+		FlagComment as string,
+		MId as string,
+		MCreatedOnUtc as timestamp,
+		ConductedByType as string,
+		ObservationTime as timestamp,
+		OldSafetyObservationId as integer
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 1,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = NewSafetyObservationId,
+		ObservationDate = Date,
+		Shift = ObservationShift,
+		CompanyId = NewCompanyId,
+		SiteId = NewSiteId,
+		ConductedById = ConductedBy,
+		AdditionalComment,
+		CreatedBy,
+		ModifiedBy = ModifiedByNewUserId,
+		ModifiedOnUtc = updatedDate,
+		SignatureDocumentId,
+		IsApproved,
+		IsReviewed,
+		ObservationType,
+		ObservationNumber,
+		DateSigned = ObserverSignaturDate,
+		IsDeleted = DerivedIsDeleted,
+		ConductedByType,
+		CreatedOnUtc,
+		OldSafetyObservationId = Uid,
+		JobDescription = CommentByObserver
+	)) ~> V3StaggingSafetyObservation
+derivedDocumentColumns sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		DocumentPath as string,
+		Name as string,
+		Size as string,
+		DocTypeCode as string,
+		LevelId as string,
+		LevelTypeCode as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 0,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = SignatureDocumentId,
+		DocumentPath = SignatureDocumentPath,
+		Name = SignatureDocumentName,
+		Size,
+		DocTypeCode,
+		LevelId = NewSafetyObservationId,
+		LevelTypeCode,
+		CreatedBy,
+		CreatedOnUtc = createdDate
+	)) ~> DocumentTarget
+OffsiderScopedUserStatus sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		SafetyObservationId as string,
+		PersonType as string,
+		IsUser as boolean,
+		UserId as string,
+		IsCrewMember as boolean,
+		CrewId as string,
+		IsListedUser as boolean,
+		ListedUserId as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		IsScopedUser as boolean,
+		ScopedUserId as string
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 2,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = NewObservedPersonId,
+		SafetyObservationId = NewSafetyObservationId,
+		PersonType,
+		IsUser,
+		UserId = ConductedByNewUserId,
+		IsCrewMember,
+		IsListedUser,
+		CreatedBy,
+		CreatedOnUtc,
+		IsScopedUser
+	)) ~> offsiderObservedTarget
+OperatorScopedUserStatus sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		SafetyObservationId as string,
+		PersonType as string,
+		IsUser as boolean,
+		UserId as string,
+		IsCrewMember as boolean,
+		CrewId as string,
+		IsListedUser as boolean,
+		ListedUserId as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		IsScopedUser as boolean,
+		ScopedUserId as string
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 3,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = NewObservedPersonId,
+		SafetyObservationId = NewSafetyObservationId,
+		PersonType,
+		IsUser,
+		UserId = ConductedByNewUserId,
+		IsCrewMember,
+		IsListedUser,
+		CreatedBy,
+		CreatedOnUtc,
+		IsScopedUser
+	)) ~> OperatorObservedPersonTarget
+filterValidReviewer sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		SafetyObservationId as string,
+		ReviewDate as timestamp,
+		ReviewedById as string,
+		AdditionalComment as string,
+		SignatureId as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		ReviewedByType as string
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 7,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = SafetyObservationReviewNewId,
+		SignatureId = NewManagementReviewDocumentId,
+		SafetyObservationId = NewSafetyObservationId,
+		ReviewDate = SignatureManagerDate,
+		ReviewedById = ManagementReviewNewUserId,
+		AdditionalComment = ManagerReviewComment,
+		CreatedBy,
+		CreatedOnUtc,
+		ReviewedByType = ReviewByType
+	)) ~> safetyObservationReviewTarget
+derivedManagementReviewDocument sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		DocumentPath as string,
+		Name as string,
+		Size as string,
+		DocTypeCode as string,
+		LevelId as string,
+		LevelTypeCode as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 6,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = NewManagementReviewDocumentId,
+		DocumentPath = ManagementReviewDocumentPath,
+		Name = ManagementReviewDocumentName,
+		Size = ManagementReviewDocumentSize,
+		DocTypeCode = ManagementReviewDocumentTypeCode,
+		LevelId = SafetyObservationReviewNewId,
+		LevelTypeCode = ManagementReviewLevelTypeCode,
+		CreatedBy,
+		CreatedOnUtc
+	)) ~> SafetyObservationReviewSignatureDocument
+derivedObserverImage sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		DocumentPath as string,
+		Name as string,
+		Size as string,
+		DocTypeCode as string,
+		LevelId as string,
+		LevelTypeCode as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 8,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = ObservationImageDocumentId,
+		DocumentPath = ObserverationImageDocumentPath,
+		Name = ObservationImageDocumentName,
+		Size,
+		DocTypeCode,
+		LevelId = NewSafetyObservationId,
+		LevelTypeCode,
+		CreatedBy,
+		CreatedOnUtc = createdDate
+	)) ~> V3ObservationDocumentTarget
+derivedOtherOffsiderFinal sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		SafetyObservationId as string,
+		PersonType as string,
+		IsUser as boolean,
+		UserId as string,
+		IsCrewMember as boolean,
+		CrewId as string,
+		IsListedUser as boolean,
+		ListedUserId as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		IsScopedUser as boolean,
+		ScopedUserId as string
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 4,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = NewObservedPersonId,
+		SafetyObservationId = NewSafetyObservationId,
+		PersonType,
+		IsUser,
+		IsCrewMember,
+		IsListedUser,
+		ListedUserId = NewListedUserId,
+		CreatedBy,
+		CreatedOnUtc,
+		IsScopedUser
+	)) ~> OtherOffsiderObservedPerson
+derivedOtherOperatorFinal sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		SafetyObservationId as string,
+		PersonType as string,
+		IsUser as boolean,
+		UserId as string,
+		IsCrewMember as boolean,
+		CrewId as string,
+		IsListedUser as boolean,
+		ListedUserId as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		IsScopedUser as boolean,
+		ScopedUserId as string
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 5,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = NewObservedPersonId,
+		SafetyObservationId = NewSafetyObservationId,
+		PersonType,
+		IsUser,
+		IsCrewMember,
+		IsListedUser,
+		ListedUserId = NewListedUserId,
+		CreatedBy,
+		CreatedOnUtc,
+		IsScopedUser
+	)) ~> OtherOperatorObservedPerson
+UserName sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		SafetyObservationId as string,
+		PersonType as string,
+		IsUser as boolean,
+		UserId as string,
+		IsCrewMember as boolean,
+		CrewId as string,
+		IsListedUser as boolean,
+		ListedUserId as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		IsScopedUser as boolean,
+		ScopedUserId as string
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 9,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		each(match(/* All input columns */true()),
+			/* Input name */$$ = $$)
+	)) ~> OtherOperatorUserTarget
+derivedColumn3 sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		UserId as string,
+		CompanyId as string,
+		StartDate as timestamp,
+		EndDate as timestamp,
+		StatusCode as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		SiteId as string,
+		CanDelete as boolean
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 10,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		UserId = ConductedByNewUserId,
+		CompanyId = NewCompanyId,
+		CreatedOnUtc = createdDate,
+		SiteId = NewSiteId,
+		CreatedBy,
+		StartDate,
+		StatusCode = ScopedUserStatus,
+		CanDelete,
+		Id = NewScopedid
+	)) ~> sink1
+derivedScopedUserRole sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		ScopedUserId as string,
+		RoleId as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 11,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = NewScopedUserRoleId,
+		ScopedUserId = NewScopedid,
+		RoleId,
+		CreatedBy,
+		CreatedOnUtc = createdDate
+	)) ~> ScopedUserRoleTarget
+derivedColumn4 sink(allowSchemaDrift: true,
+	validateSchema: false,
+	input(
+		Id as string,
+		UserId as string,
+		SiteId as string,
+		StatusCode as string,
+		CreatedBy as string,
+		CreatedOnUtc as timestamp,
+		ModifiedBy as string,
+		ModifiedOnUtc as timestamp,
+		CompanyId as string
+	),
+	deletable:false,
+	insertable:true,
+	updateable:false,
+	upsertable:false,
+	format: 'table',
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true,
+	saveOrder: 12,
+	errorHandlingOption: 'stopOnFirstError',
+	mapColumn(
+		Id = NewUserScopedSiteId,
+		UserId = ConductedByNewUserId,
+		SiteId = AllSiteId,
+		StatusCode = ScopedUserStatus,
+		CreatedBy = dedupScopedUsers@CreatedBy,
+		CreatedOnUtc = createdDate,
+		CompanyId = NewCompanyId
+	)) ~> sink2
