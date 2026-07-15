@@ -438,7 +438,7 @@ V3StaggingListedUser select(mapColumn(
 	),
 	skipDuplicateMapInputs: true,
 	skipDuplicateMapOutputs: true) ~> selectListedUser
-filterOffsiderListedCandidate, selectListedUser join(trim(lower(other_offsider)) == lower(LisetedUserDisplayName),
+derivedOtherOffsider, selectListedUser join(trim(lower(other_offsider)) == lower(LisetedUserDisplayName),
 	joinType:'inner',
 	matchType:'exact',
 	ignoreSpaces: false,
@@ -621,49 +621,6 @@ joinOtherOperatorUserLookup, filterDedupMarathonOperator join(trim(lower(other_o
 	ignoreSpaces: false,
 	broadcast: 'right')~> joinOtherOperatorMarathonLookup
 V3StaggingUserSource select(mapColumn(
-		OtherOffsiderUserId = Id,
-		DisplayName
-	),
-	skipDuplicateMapInputs: true,
-	skipDuplicateMapOutputs: true) ~> SelectOtherOffsiderUser
-SelectOtherOffsiderUser window(over(DisplayNameKey = lower(trim(DisplayName))),
-	asc(OtherOffsiderUserId, true),
-	RowNum = rowNumber()) ~> windowDedupOffsiderUser
-windowDedupOffsiderUser filter(RowNum == 1) ~> filterDedupOffsiderUser
-derivedOtherOffsider, filterDedupOffsiderUser join(trim(lower(other_offsider)) == trim(lower(DisplayName)),
-	joinType:'left',
-	matchType:'exact',
-	ignoreSpaces: false,
-	broadcast: 'right')~> joinOtherOffsiderUserLookup
-MarathonUserAsScoped select(mapColumn(
-		OtherOffsiderScopedUserId = Id,
-		DisplayName
-	),
-	skipDuplicateMapInputs: true,
-	skipDuplicateMapOutputs: true) ~> selectMarathonScopedOffsiderName
-selectMarathonScopedOffsiderName window(over(DisplayNameKey = lower(trim(DisplayName))),
-	asc(OtherOffsiderScopedUserId, true),
-	RowNum = rowNumber()) ~> windowDedupMarathonOffsider
-windowDedupMarathonOffsider filter(RowNum == 1) ~> filterDedupMarathonOffsider
-joinOtherOffsiderUserLookup, filterDedupMarathonOffsider join(trim(lower(other_offsider)) == trim(lower(selectMarathonScopedOffsiderName@DisplayName)),
-	joinType:'left',
-	matchType:'exact',
-	ignoreSpaces: false,
-	broadcast: 'right')~> joinOtherOffsiderMarathonLookup
-joinOtherOffsiderMarathonLookup split(isNull(OtherOffsiderUserId) && isNull(OtherOffsiderScopedUserId),
-	disjoint: false) ~> split6@(OtherOffsiderListedUser, OtherOffsiderUser)
-split6@OtherOffsiderListedUser filter(isNull(OtherOffsiderUserId) && isNull(OtherOffsiderScopedUserId)) ~> filterOffsiderListedCandidate
-split6@OtherOffsiderUser filter(!isNull(OtherOffsiderUserId) || !isNull(OtherOffsiderScopedUserId)) ~> filterOffsiderUserOrScoped
-filterOffsiderUserOrScoped derive(other_offsider = case(
-    lower(other_offsider) == lower('Mick Bragg'), 'Michael Bragg', 
-    lower(other_offsider) == lower('Adam Mathewâ€™s'), 'Adam Mathews',
-    other_offsider
-),
-		IsUser = iif(!isNull(OtherOffsiderUserId), 1, 0),
-		IsListedUser = 0,
-		IsScopedUser = iif(isNull(OtherOffsiderUserId) && !isNull(OtherOffsiderScopedUserId), 1, 0),
-		ScopedUserId = OtherOffsiderScopedUserId) ~> UserNameOffsider
-V3StaggingUserSource select(mapColumn(
 		FitterOffsiderUserId = Id,
 		FitterOffsiderUserOldId = OldUserId
 	),
@@ -674,10 +631,6 @@ filter4, selectFitterOffsiderRealUser join(Fitteroffsider == FitterOffsiderUserO
 	matchType:'exact',
 	ignoreSpaces: false,
 	broadcast: 'right')~> joinOffsiderRealUserCheck
-joinOffsiderRealUserCheck derive(IsUser = iif(!isNull(FitterOffsiderUserId), 1, 0),
-		IsScopedUser = iif(isNull(FitterOffsiderUserId), 1, 0),
-		UserId = iif(!isNull(FitterOffsiderUserId), FitterOffsiderUserId, toString(null())),
-		ScopedUserId = iif(isNull(FitterOffsiderUserId), ConductedByNewUserId, toString(null()))) ~> derivedOffsiderObservedPersonFinal
 V3StaggingUserSource select(mapColumn(
 		FitterOperatorUserId = Id,
 		FitterOperatorUserOldId = OldUserId
@@ -689,10 +642,49 @@ filter5, selectFitterOperatorRealUser join(Fitteroperator == FitterOperatorUserO
 	matchType:'exact',
 	ignoreSpaces: false,
 	broadcast: 'right')~> joinOperatorRealUserCheck
-joinOperatorRealUserCheck derive(IsUser = iif(!isNull(FitterOperatorUserId), 1, 0),
+dedupScopedUsers, ExistingScopedUsers join(dedupScopedUsers@UserId == ExistingScopedUsers@UserId
+	&& NewCompanyId == CompanyId,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinExistingScopedUserMatch
+joinExistingScopedUserMatch derive(ResolvedScopedUserId = Id) ~> derivedExistingResolved
+derivedExistingResolved filter(!isNull(ResolvedScopedUserId)) ~> filterExistingResolved
+derivedColumn3 select(mapColumn(
+		ResolvedScopedUserId = NewScopedid,
+		ScopedUserKey = ConductedByNewUserId,
+		ScopedCompanyKey = NewCompanyId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectNewScopedUserPk
+filterExistingResolved select(mapColumn(
+		ResolvedScopedUserId,
+		ScopedUserKey = ConductedByNewUserId,
+		ScopedCompanyKey = NewCompanyId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectExistingScopedUserPk
+selectNewScopedUserPk, selectExistingScopedUserPk union(byName: true)~> allResolvedScopedUsers
+joinOffsiderRealUserCheck, allResolvedScopedUsers join(ConductedByNewUserId == ScopedUserKey
+	&& NewCompanyId == ScopedCompanyKey,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinOffsiderScopedUserPk
+joinOffsiderScopedUserPk derive(IsUser = iif(!isNull(FitterOffsiderUserId), 1, 0),
+		IsScopedUser = iif(isNull(FitterOffsiderUserId), 1, 0),
+		UserId = iif(!isNull(FitterOffsiderUserId), FitterOffsiderUserId, toString(null())),
+		ScopedUserId = iif(isNull(FitterOffsiderUserId), ResolvedScopedUserId, toString(null()))) ~> derivedOffsiderObservedPersonFinal
+joinOperatorRealUserCheck, allResolvedScopedUsers join(ConductedByNewUserId == ScopedUserKey
+	&& NewCompanyId == ScopedCompanyKey,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'auto')~> joinOperatorScopedUserPk
+joinOperatorScopedUserPk derive(IsUser = iif(!isNull(FitterOperatorUserId), 1, 0),
 		IsScopedUser = iif(isNull(FitterOperatorUserId), 1, 0),
 		UserId = iif(!isNull(FitterOperatorUserId), FitterOperatorUserId, toString(null())),
-		ScopedUserId = iif(isNull(FitterOperatorUserId), ConductedByNewUserId, toString(null()))) ~> derivedOperatorObservedPersonFinal
+		ScopedUserId = iif(isNull(FitterOperatorUserId), ResolvedScopedUserId, toString(null()))) ~> derivedOperatorObservedPersonFinal
 derivedColumn2 sink(allowSchemaDrift: true,
 	validateSchema: false,
 	input(
@@ -818,7 +810,7 @@ derivedOffsiderObservedPersonFinal sink(allowSchemaDrift: true,
 	format: 'table',
 	skipDuplicateMapInputs: true,
 	skipDuplicateMapOutputs: true,
-	saveOrder: 2,
+	saveOrder: 3,
 	errorHandlingOption: 'stopOnFirstError',
 	mapColumn(
 		Id = NewObservedPersonId,
@@ -859,7 +851,7 @@ derivedOperatorObservedPersonFinal sink(allowSchemaDrift: true,
 	format: 'table',
 	skipDuplicateMapInputs: true,
 	skipDuplicateMapOutputs: true,
-	saveOrder: 3,
+	saveOrder: 4,
 	errorHandlingOption: 'stopOnFirstError',
 	mapColumn(
 		Id = NewObservedPersonId,
@@ -896,7 +888,7 @@ filterValidReviewer sink(allowSchemaDrift: true,
 	format: 'table',
 	skipDuplicateMapInputs: true,
 	skipDuplicateMapOutputs: true,
-	saveOrder: 7,
+	saveOrder: 8,
 	errorHandlingOption: 'stopOnFirstError',
 	mapColumn(
 		Id = SafetyObservationReviewNewId,
@@ -931,7 +923,7 @@ derivedManagementReviewDocument sink(allowSchemaDrift: true,
 	format: 'table',
 	skipDuplicateMapInputs: true,
 	skipDuplicateMapOutputs: true,
-	saveOrder: 6,
+	saveOrder: 7,
 	errorHandlingOption: 'stopOnFirstError',
 	mapColumn(
 		Id = NewManagementReviewDocumentId,
@@ -966,7 +958,7 @@ derivedObserverImage sink(allowSchemaDrift: true,
 	format: 'table',
 	skipDuplicateMapInputs: true,
 	skipDuplicateMapOutputs: true,
-	saveOrder: 8,
+	saveOrder: 9,
 	errorHandlingOption: 'stopOnFirstError',
 	mapColumn(
 		Id = ObservationImageDocumentId,
@@ -1005,7 +997,7 @@ derivedOtherOffsiderFinal sink(allowSchemaDrift: true,
 	format: 'table',
 	skipDuplicateMapInputs: true,
 	skipDuplicateMapOutputs: true,
-	saveOrder: 4,
+	saveOrder: 5,
 	errorHandlingOption: 'stopOnFirstError',
 	mapColumn(
 		Id = NewObservedPersonId,
@@ -1045,7 +1037,7 @@ derivedOtherOperatorFinal sink(allowSchemaDrift: true,
 	format: 'table',
 	skipDuplicateMapInputs: true,
 	skipDuplicateMapOutputs: true,
-	saveOrder: 5,
+	saveOrder: 6,
 	errorHandlingOption: 'stopOnFirstError',
 	mapColumn(
 		Id = NewObservedPersonId,
@@ -1085,44 +1077,12 @@ UserName sink(allowSchemaDrift: true,
 	format: 'table',
 	skipDuplicateMapInputs: true,
 	skipDuplicateMapOutputs: true,
-	saveOrder: 9,
+	saveOrder: 10,
 	errorHandlingOption: 'stopOnFirstError',
 	mapColumn(
 		each(match(/* All input columns */true()),
 			/* Input name */$$ = $$)
 	)) ~> OtherOperatorUserTarget
-UserNameOffsider sink(allowSchemaDrift: true,
-	validateSchema: false,
-	input(
-		Id as string,
-		SafetyObservationId as string,
-		PersonType as string,
-		IsUser as boolean,
-		UserId as string,
-		IsCrewMember as boolean,
-		CrewId as string,
-		IsListedUser as boolean,
-		ListedUserId as string,
-		CreatedBy as string,
-		CreatedOnUtc as timestamp,
-		ModifiedBy as string,
-		ModifiedOnUtc as timestamp,
-		IsScopedUser as boolean,
-		ScopedUserId as string
-	),
-	deletable:false,
-	insertable:true,
-	updateable:false,
-	upsertable:false,
-	format: 'table',
-	skipDuplicateMapInputs: true,
-	skipDuplicateMapOutputs: true,
-	saveOrder: 13,
-	errorHandlingOption: 'stopOnFirstError',
-	mapColumn(
-		each(match(/* All input columns */true()),
-			/* Input name */$$ = $$)
-	)) ~> OtherOffsiderUserTarget
 derivedColumn3 sink(allowSchemaDrift: true,
 	validateSchema: false,
 	input(
@@ -1146,7 +1106,7 @@ derivedColumn3 sink(allowSchemaDrift: true,
 	format: 'table',
 	skipDuplicateMapInputs: true,
 	skipDuplicateMapOutputs: true,
-	saveOrder: 10,
+	saveOrder: 2,
 	errorHandlingOption: 'stopOnFirstError',
 	mapColumn(
 		UserId = ConductedByNewUserId,
