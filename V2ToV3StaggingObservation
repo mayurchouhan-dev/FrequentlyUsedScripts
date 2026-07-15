@@ -620,6 +620,36 @@ joinOtherOperatorUserLookup, filterDedupMarathonOperator join(trim(lower(other_o
 	matchType:'exact',
 	ignoreSpaces: false,
 	broadcast: 'right')~> joinOtherOperatorMarathonLookup
+V3StaggingUserSource select(mapColumn(
+		FitterOffsiderUserId = Id,
+		FitterOffsiderUserOldId = OldUserId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectFitterOffsiderRealUser
+filter4, selectFitterOffsiderRealUser join(Fitteroffsider == FitterOffsiderUserOldId,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'right')~> joinOffsiderRealUserCheck
+joinOffsiderRealUserCheck derive(IsUser = iif(!isNull(FitterOffsiderUserId), 1, 0),
+		IsScopedUser = iif(isNull(FitterOffsiderUserId), 1, 0),
+		UserId = iif(!isNull(FitterOffsiderUserId), FitterOffsiderUserId, toString(null())),
+		ScopedUserId = iif(isNull(FitterOffsiderUserId), ConductedByNewUserId, toString(null()))) ~> derivedOffsiderObservedPersonFinal
+V3StaggingUserSource select(mapColumn(
+		FitterOperatorUserId = Id,
+		FitterOperatorUserOldId = OldUserId
+	),
+	skipDuplicateMapInputs: true,
+	skipDuplicateMapOutputs: true) ~> selectFitterOperatorRealUser
+filter5, selectFitterOperatorRealUser join(Fitteroperator == FitterOperatorUserOldId,
+	joinType:'left',
+	matchType:'exact',
+	ignoreSpaces: false,
+	broadcast: 'right')~> joinOperatorRealUserCheck
+joinOperatorRealUserCheck derive(IsUser = iif(!isNull(FitterOperatorUserId), 1, 0),
+		IsScopedUser = iif(isNull(FitterOperatorUserId), 1, 0),
+		UserId = iif(!isNull(FitterOperatorUserId), FitterOperatorUserId, toString(null())),
+		ScopedUserId = iif(isNull(FitterOperatorUserId), ConductedByNewUserId, toString(null()))) ~> derivedOperatorObservedPersonFinal
 derivedColumn2 sink(allowSchemaDrift: true,
 	validateSchema: false,
 	input(
@@ -719,7 +749,7 @@ derivedDocumentColumns sink(allowSchemaDrift: true,
 		CreatedBy,
 		CreatedOnUtc = createdDate
 	)) ~> DocumentTarget
-OffsiderScopedUserStatus sink(allowSchemaDrift: true,
+derivedOffsiderObservedPersonFinal sink(allowSchemaDrift: true,
 	validateSchema: false,
 	input(
 		Id as string,
@@ -752,14 +782,15 @@ OffsiderScopedUserStatus sink(allowSchemaDrift: true,
 		SafetyObservationId = NewSafetyObservationId,
 		PersonType,
 		IsUser,
-		UserId = ConductedByNewUserId,
+		UserId,
 		IsCrewMember,
 		IsListedUser,
 		CreatedBy,
 		CreatedOnUtc,
-		IsScopedUser
+		IsScopedUser,
+		ScopedUserId
 	)) ~> offsiderObservedTarget
-OperatorScopedUserStatus sink(allowSchemaDrift: true,
+derivedOperatorObservedPersonFinal sink(allowSchemaDrift: true,
 	validateSchema: false,
 	input(
 		Id as string,
@@ -792,12 +823,13 @@ OperatorScopedUserStatus sink(allowSchemaDrift: true,
 		SafetyObservationId = NewSafetyObservationId,
 		PersonType,
 		IsUser,
-		UserId = ConductedByNewUserId,
+		UserId,
 		IsCrewMember,
 		IsListedUser,
 		CreatedBy,
 		CreatedOnUtc,
-		IsScopedUser
+		IsScopedUser,
+		ScopedUserId
 	)) ~> OperatorObservedPersonTarget
 filterValidReviewer sink(allowSchemaDrift: true,
 	validateSchema: false,
