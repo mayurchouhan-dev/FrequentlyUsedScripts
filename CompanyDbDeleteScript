@@ -1,5 +1,7 @@
 -- Created by GitHub Copilot in SSMS - review carefully before executing
 
+--select * from VehicleAssets
+
 
 
 -- STEP 1: Define the list of CompanyIds to delete
@@ -12,7 +14,7 @@ DECLARE @CompaniesToDelete TABLE (
 -- STEP 2: Insert CompanyIds you want to delete
 INSERT INTO @CompaniesToDelete (CompanyId)
 VALUES 
-    ('C97FE366-6B42-4A52-9D78-80936E753717');
+    ('CD85E349-9AC0-4291-B498-73B8C8E27486');
 
 DECLARE @ApplyChanges BIT = 1;  -- 1 = commit changes, 0 = dry-run (rollback)
 
@@ -294,6 +296,12 @@ BEGIN
         DELETE FROM dbo.pressurecheckreadings WHERE tenantid = @CurrentCompanyId;
         SET @RowsAffected = @@ROWCOUNT;
         PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from pressurecheckreadings';
+
+		--wheel rim 
+		DELETE FROM DBO.WheelRimAssets WHERE TenantId = @CurrentCompanyId;
+		SET @RowsAffected = @@ROWCOUNT
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from wheelrimasset';
+
 
         -- Vehicle assets
         DELETE FROM dbo.vehicleassets WHERE tenantid = @CurrentCompanyId;
