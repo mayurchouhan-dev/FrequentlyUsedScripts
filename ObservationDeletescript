@@ -1,37 +1,4 @@
-  --select * from Companys
-  select * from Users
-  --select * from ScopedUsers
-  --select * from ScopedUserRoles --'SUPERVISIOR' RoleId
-  --select * from UserScopedSites --BloomField all sites
-
-  select * from UserRoles
-  select * from ScopedUserRoles
-  select * from roles
-
-    select * from scopeduserroles
-  select * from ScopedUsers
-  select * from UserScopedSites
-
-  select * from ListedUsers
-
-
-
-SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
-WHERE TABLE_NAME = 'ScopedUsers' 
-AND CONSTRAINT_TYPE = 'FOREIGN KEY'
-
-select * from ObservedPersons where SafetyObservationId='d9c34041-03ca-4ce4-bd25-c673b29f2f8e'
-
-select * from ListedUsers
-
-ALTER TABLE dbo.ScopedUsers 
-DROP CONSTRAINT FK_ScopedUsers_Users_UserId
-
-select * from scopeduserroles
-
-  --select * from Users where CompanyId='8496071F-AE46-499F-88D8-EF1A6C45C22D';
-
-  DECLARE @CompanyId UNIQUEIDENTIFIER = 'C97FE366-6B42-4A52-9D78-80936E753717';
+  DECLARE @CompanyId UNIQUEIDENTIFIER = '86918AD9-3604-4DA5-B956-49AA28DB2436';
   
   DELETE FROM safetytaskresponses
     WHERE safetyobservationid IN (SELECT Id FROM safetyobservations WHERE companyid = @CompanyId);
@@ -54,16 +21,11 @@ select * from scopeduserroles
 		delete  from ScopedUserRoles where scopeduserid in  (select id from ScopedUsers where companyid = @CompanyId)
 
 --need to update-- only scoped user site should be deleted
-		delete  from UserScopedSites  where companyid = @CompanyId
+		
+
+delete from UserScopedSites  where id not in (select uss.id from UserScopedSites uss
+inner join Users u on uss.userid = u.id
+where u.CompanyId=@CompanyId)
 
 
 	delete from ScopedUsers where companyid = @CompanyId;
-
-	 --select * from UserScopedSites
-
-
-	
-
-
-
-
