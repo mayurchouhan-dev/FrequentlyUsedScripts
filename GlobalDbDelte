@@ -9,6 +9,9 @@
 --select * from Users
 --select * from Tenants where name like '%bloom%'
 
+--to do--
+--delete from GlobalOperationHistorys--
+
 
 
 
