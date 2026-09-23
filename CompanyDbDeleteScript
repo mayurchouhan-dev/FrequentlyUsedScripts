@@ -14,7 +14,7 @@ DECLARE @CompaniesToDelete TABLE (
 -- STEP 2: Insert CompanyIds you want to delete
 INSERT INTO @CompaniesToDelete (CompanyId)
 VALUES 
-    ('CD85E349-9AC0-4291-B498-73B8C8E27486');
+    ('6C39418E-66B1-4D59-95F8-50BF6A91F281');
 
 DECLARE @ApplyChanges BIT = 1;  -- 1 = commit changes, 0 = dry-run (rollback)
 
@@ -93,10 +93,31 @@ BEGIN
         SET @RowsAffected = @@ROWCOUNT;
         PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetmovementhistorys (TyreAssets)';
 
+--        DELETE FROM dbo.assetsdispositionhistories
+--        WHERE assetId IN (SELECT id FROM dbo.TyreAssets WHERE tenantid = @CurrentCompanyId);
+--        SET @RowsAffected = @@ROWCOUNT;
+--        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsdispositionhistories (TyreAssets)';
+
+
+--        DELETE FROM dbo.assetsdispositionhistories
+--        WHERE assetId IN (SELECT id FROM dbo.rimassets WHERE tenantid = @CurrentCompanyId);
+--        SET @RowsAffected = @@ROWCOUNT;
+--        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsdispositionhistories (TyreAssets)';
+
+--        SELECT adh.AssetType, COUNT(*) AS Rows
+--FROM dbo.AssetsDispositionHistories adh
+--WHERE adh.NewDispositionTypeId IN (SELECT id FROM dbo.propertyoptions WHERE tenantid = '6C39418E-66B1-4D59-95F8-50BF6A91F281')
+--   OR adh.OldDispositionTypeId IN (SELECT id FROM dbo.propertyoptions WHERE tenantid = '6C39418E-66B1-4D59-95F8-50BF6A91F281')
+--GROUP BY adh.AssetType;
+
+        -- Any remaining disposition histories that reference this tenant's property options
+        -- (e.g. WheelRimAssets, or rows whose asset was already removed)
         DELETE FROM dbo.assetsdispositionhistories
-        WHERE assetId IN (SELECT id FROM dbo.TyreAssets WHERE tenantid = @CurrentCompanyId);
+        WHERE NewDispositionTypeId IN (SELECT id FROM dbo.propertyoptions WHERE tenantid = @CurrentCompanyId)
+           OR OldDispositionTypeId IN (SELECT id FROM dbo.propertyoptions WHERE tenantid = @CurrentCompanyId);
         SET @RowsAffected = @@ROWCOUNT;
-        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsdispositionhistories (TyreAssets)';
+        PRINT 'Deleted ' + CAST(@RowsAffected AS NVARCHAR(10)) + ' rows from assetsdispositionhistories (remaining by disposition)';
+
 
         DELETE FROM dbo.scrapAssets
         WHERE assetid IN (SELECT id FROM dbo.TyreAssets WHERE tenantid = @CurrentCompanyId);
