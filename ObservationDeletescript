@@ -23,9 +23,9 @@
 --need to update-- only scoped user site should be deleted
 		
 
-delete from UserScopedSites  where id not in (select uss.id from UserScopedSites uss
-inner join Users u on uss.userid = u.id
-where u.CompanyId=@CompanyId)
+--delete from UserScopedSites  where id not in (select uss.id from UserScopedSites uss
+--inner join Users u on uss.userid = u.id
+--where u.CompanyId=@CompanyId)
 
 
 	delete from ScopedUsers where companyid = @CompanyId;
