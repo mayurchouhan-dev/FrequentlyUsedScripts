@@ -1,0 +1,17 @@
+delete from Documents where leveltypecode = 'OBSERVATION' and  levelid not in (select id from  safetyobservations)
+ 
+DELETE d
+FROM Documents d
+WHERE d.LevelTypeCode = 'OBSERVATIONCHECKLIST'
+  AND NOT EXISTS (SELECT 1 FROM SafetyObservationChecklists s WHERE s.Id = d.LevelId)
+  AND NOT EXISTS (SELECT 1 FROM SafetyObservationChecklists s WHERE s.DocumentId = d.Id);
+ 
+ 
+delete from Documents where leveltypecode = 'OBSERVATIONREVIEWER' and  levelid not in (select id from  SafetyObservationReviews)
+ 
+delete from Documents where leveltypecode = 'OBSERVATIONSIGNATURE' and  levelid not in (select id from  safetyobservations)
+
+
+after flow
+--delete from damages where DamageType = 'INSPECTION' and TypeId not in (
+--select id  from Inspections )
