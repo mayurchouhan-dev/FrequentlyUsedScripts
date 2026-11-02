@@ -1,0 +1,111 @@
+DECLARE @CompanyId INT = 1169;
+
+
+
+DECLARE @Counts TABLE (AssetType VARCHAR(30), UpdatedRows INT);
+
+
+
+BEGIN TRANSACTION;
+
+
+
+-- Tyres
+UPDATE tto
+SET tto.OperationTypeId = 34
+FROM Tbl_Tyre_Operations tto
+INNER JOIN Tbl_Tyre_Asset ta
+    ON tto.AssetId = ta.uid
+WHERE ta.CompanyId = @CompanyId
+  AND tto.OperationTypeId = 3
+  AND (
+        tto.Details LIKE '%Disposition changed to In Production%'
+        OR tto.Details LIKE '%Tyre assigned to truck%'
+      );
+INSERT INTO @Counts VALUES ('Tyres', @@ROWCOUNT);
+
+
+
+-- Wheels
+UPDATE tto
+SET tto.OperationTypeId = 34
+FROM Tbl_Wheel_Operations tto
+INNER JOIN Tbl_Wheel_Asset ta
+    ON tto.AssetId = ta.uid
+WHERE ta.CompanyId = @CompanyId
+  AND tto.OperationTypeId = 3
+  AND tto.Details LIKE '%Disposition changed to In Production%';
+INSERT INTO @Counts VALUES ('Wheels', @@ROWCOUNT);
+
+
+
+-- Rims
+UPDATE tto
+SET tto.OperationTypeId = 34
+FROM Tbl_Rim_Operations tto
+INNER JOIN Tbl_Rim_Asset ta
+    ON tto.AssetId = ta.uid
+WHERE ta.CompanyId = @CompanyId
+  AND tto.OperationTypeId = 3
+  AND tto.Details LIKE '%Disposition changed to In Production%';
+INSERT INTO @Counts VALUES ('Rims', @@ROWCOUNT);
+
+
+
+-- Adapter Plates
+UPDATE tto
+SET tto.OperationTypeId = 34
+FROM Tbl_AdapterPlate_Operations tto
+INNER JOIN Tbl_AdapterPlate_Asset ta
+    ON tto.AssetId = ta.uid
+WHERE ta.CompanyId = @CompanyId
+  AND tto.OperationTypeId = 3
+  AND (
+        tto.Details LIKE '%Disposition changed to In Production%'
+        OR tto.Details LIKE '%Adapter Plate assigned to truck%'
+      );
+INSERT INTO @Counts VALUES ('Adapter Plates', @@ROWCOUNT);
+
+
+
+-- TPMS
+UPDATE tto
+SET tto.OperationTypeId = 34
+FROM Tbl_TPMS_Operations tto
+INNER JOIN Tbl_TPMS_Asset ta
+    ON tto.AssetId = ta.uid
+WHERE ta.CompanyId = @CompanyId
+  AND tto.OperationTypeId = 3
+  AND (
+        tto.Details LIKE '%Disposition changed to In Production%'
+        OR tto.Details LIKE '%TPMS Sensor assigned to truck%'
+      );
+INSERT INTO @Counts VALUES ('TPMS', @@ROWCOUNT);
+
+
+
+-- Chains
+UPDATE tto
+SET tto.OperationTypeId = 34
+FROM Tbl_Chain_Operations tto
+INNER JOIN Tbl_CHAIN_Asset ta
+    ON tto.AssetId = ta.uid
+WHERE ta.CompanyId = @CompanyId
+  AND tto.OperationTypeId = 3
+  AND (
+        tto.Details LIKE '%Disposition changed to In Production%'
+        OR tto.Details LIKE '%Chain assigned to truck%'
+      );
+INSERT INTO @Counts VALUES ('Chains', @@ROWCOUNT);
+
+
+
+SELECT AssetType, UpdatedRows FROM @Counts
+UNION ALL
+SELECT 'TOTAL', SUM(UpdatedRows) FROM @Counts;
+
+
+
+-- Review the counts, then run ONE of these in the same session:
+-- COMMIT TRANSACTION;
+-- ROLLBACK TRANSACTION;
