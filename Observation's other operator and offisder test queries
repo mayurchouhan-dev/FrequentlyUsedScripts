@@ -1,0 +1,31 @@
+select
+--od.uid,
+od.ObservationNumber, ts.SiteName, od.other_offsider, od.other_operator 
+--*
+from Tbl_ObservationDetail  od
+inner join Tbl_Site ts on od.SiteId = ts.Uid
+where (od.IsDeleted is null or od.IsDeleted = 0) and
+od.CompanyId=1159 and od.Fitteroffsider > 0 and od.Fitteroperator = 0
+--and od.other_offsider is not null
+and od.other_operator is not null
+order by ts.SiteName
+ 
+--select * from Tbl_User where uid=6395
+
+select * from Tbl_Company where uid = 1159
+select * from Tbl_ObservationDetail where CompanyId=1179
+ 
+select
+--od.uid,
+od.uid,od.ObservationNumber, ts.SiteName, od.other_offsider, od.other_operator 
+--*
+from Tbl_ObservationDetail  od
+inner join Tbl_Site ts on od.SiteId = ts.Uid
+where (od.IsDeleted is null or od.IsDeleted = 0) and
+od.CompanyId=1169 and od.Fitteroffsider <= 0 
+--and od.Fitteroperator = 0
+and od.other_offsider is not null
+--and od.other_operator is not null
+order by ts.SiteName
+ 
+select * from SafetyObservations where id not in(select safetyobservationid from observedpersons where persontype='Operator')and CompanyId=''
