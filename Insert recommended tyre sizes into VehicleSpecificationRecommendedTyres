@@ -1,0 +1,416 @@
+--select * from vehicleSpecifications where id='efefae89-6f7b-4630-b1cb-4546c6dec37f'
+
+
+
+
+
+--select * from VehicleSpecificationRecommendedTyres where
+--vehiclespecificationid='EFEFAE89-6F7B-4630-B1CB-4546C6DEC37F'
+--select * from VehicleSpecificationRecommendedRims
+/* =====================================================================
+   Insert recommended tyre sizes into VehicleSpecificationRecommendedTyres
+   VehicleSpecificationId is looked up from VehicleSpecification by Name.
+   - Names are matched after trimming and collapsing double spaces.
+   - Rows that already exist (same spec + WidthRatio + Diameter) are skipped.
+   - Runs in a transaction: review the output, then COMMIT or ROLLBACK.
+   ===================================================================== */
+
+
+
+DECLARE @CreatedBy UNIQUEIDENTIFIER = '1BDEF454-0E0D-472D-2B27-08DD77741603';  -- change if needed
+
+
+
+IF OBJECT_ID('tempdb..#Rec') IS NOT NULL DROP TABLE #Rec;
+CREATE TABLE #Rec (
+    WidthRatio NVARCHAR(50)  NOT NULL,
+    Diameter   NVARCHAR(50)  NOT NULL,
+    Name       NVARCHAR(200) NOT NULL
+);
+
+
+
+INSERT INTO #Rec (WidthRatio, Diameter, Name) VALUES
+(N'23.5',    N'25',   N'Komatsu HM300-5'),
+(N'14.00',   N'24',   N'John Deere 670GX'),
+(N'17.5',    N'25',   N'John Deere 670GX'),
+(N'18.00',   N'33',   N'Kalmar Shuttle SHC 250H'),
+(N'450/95',  N'25',   N'Kalmar Shuttle SHC 250H'),
+(N'37.25',   N'35',   N'Caterpillar 631K'),
+(N'55.5/80', N'57',   N'Letourneau L1400'),
+(N'27.00',   N'49',   N'Caterpillar 777B'),
+(N'27.00',   N'49',   N'Euclid R90'),
+(N'37.25',   N'35',   N'Caterpillar 637K'),
+(N'24.00',   N'35',   N'Caterpillar 773D'),
+(N'40.5/75', N'39',   N'Caterpillar 651E'),
+(N'58/85',   N'57',   N'Caterpillar 994'),
+(N'53.5/85', N'57',   N'Caterpillar 994'),
+(N'60/80',   N'57',   N'Caterpillar 994'),
+(N'40.5/75', N'39',   N'Caterpillar 657K'),
+(N'23.5',    N'25',   N'Caterpillar 16G'),
+(N'53/80',   N'63',   N'Caterpillar 794 AC'),
+(N'15.5',    N'25',   N'Volvo L50'),
+(N'17.5',    N'25',   N'Volvo L50'),
+(N'550/65',  N'25',   N'Volvo L50'),
+(N'53/80',   N'63',   N'Hitachi EH5000'),
+(N'40.5/75', N'39',   N'Caterpillar 657B'),
+(N'40.00',   N'57',   N'Caterpillar 793'),
+(N'46/90',   N'57',   N'Caterpillar 793'),
+(N'29.5',    N'29',   N'Caterpillar 24M'),
+(N'29.5',    N'29',   N'Caterpillar R2900'),
+(N'42/90',   N'57',   N'Komatsu 730E Dresser'),
+(N'37.00',   N'57',   N'Komatsu 730E Dresser'),
+(N'40.00',   N'57',   N'Komatsu 730E Dresser'),
+(N'12.00',   N'20',   N'Omega 16-12N Forklift'),
+(N'35/65',   N'33',   N'Komatsu WA600-6'),
+(N'29.5',    N'25',   N'Caterpillar 980F'),
+(N'35/65',   N'33',   N'Atlas Copco MT65'),
+(N'45/65',   N'45',   N'Tiger 690C'),
+(N'50/80',   N'57',   N'Euclid EH4500'),
+(N'50/90',   N'57',   N'Euclid EH4500'),
+(N'24.00',   N'35',   N'Komatsu HD465-7'),
+(N'18.00',   N'25',   N'Kalmar DCF410CSG Forklift'),
+(N'23.5',    N'25',   N'Caterpillar 950F'),
+(N'40.5/75', N'39',   N'Caterpillar 651'),
+(N'45/65',   N'45',   N'Tiger 690'),
+(N'17.5',    N'25',   N'Komatsu GD655'),
+(N'23.5',    N'25',   N'Caterpillar 16M-r'),
+(N'13.00',   N'24',   N'Caterpillar 140H'),
+(N'15.5',    N'25',   N'Caterpillar 140H'),
+(N'14.00',   N'24',   N'Caterpillar 140H'),
+(N'17.5',    N'25',   N'Caterpillar 140H'),
+(N'37.25',   N'35',   N'Caterpillar 631G'),
+(N'14.00',   N'24',   N'Caterpillar 140M'),
+(N'15.5',    N'25',   N'Caterpillar 140M'),
+(N'13.00',   N'24',   N'Caterpillar 140M'),
+(N'17.5',    N'25',   N'Caterpillar 140M'),
+(N'16.9',    N'24',   N'Komatsu WA120-1'),
+(N'17.5',    N'25',   N'Komatsu WA120-1'),
+(N'42/90',   N'57',   N'Caterpillar 789B'),
+(N'37.00',   N'57',   N'Caterpillar 789B'),
+(N'26.5',    N'25',   N'Volvo BM L150'),
+(N'23.5',    N'25',   N'Volvo BM L150'),
+(N'26.5',    N'25',   N'Komatsu WA480-6'),
+(N'42/90',   N'57',   N'Caterpillar 789C'),
+(N'37.00',   N'57',   N'Caterpillar 789C'),
+(N'40.00',   N'57',   N'Caterpillar 789C'),
+(N'29.5',    N'29',   N'Sandvik LH517'),
+(N'45/65',   N'39',   N'Caterpillar 990'),
+(N'29.5',    N'25',   N'Caterpillar 980C'),
+(N'40.5/75', N'39',   N'Caterpillar 657E'),
+(N'50/80',   N'57',   N'Caterpillar 793F'),
+(N'17.5',    N'25',   N'Caterpillar IT12B'),
+(N'45/65',   N'45',   N'Caterpillar 992H'),
+(N'29.5',    N'25',   N'Hitachi AH400'),
+(N'24.00',   N'35',   N'Caterpillar 775G'),
+(N'26.5',    N'25',   N'Caterpillar 966H'),
+(N'20.5',    N'25',   N'Hyundai HL740'),
+(N'33.00',   N'51',   N'Caterpillar 785B'),
+(N'45/65',   N'39',   N'Letourneau L800'),
+(N'23.5',    N'25',   N'Caterpillar IT62'),
+(N'40.00',   N'57',   N'Caterpillar 793C'),
+(N'46/90',   N'57',   N'Caterpillar 793C'),
+(N'37.25',   N'35',   N'Caterpillar 637G'),
+(N'17.5',    N'25',   N'Komatsu WA250'),
+(N'20.5',    N'25',   N'Komatsu WA250'),
+(N'27.00',   N'49',   N'Komatsu HD785-7'),
+(N'35/65',   N'33',   N'Komatsu WD600'),
+(N'24.00',   N'35',   N'Caterpillar 773E'),
+(N'35/65',   N'33',   N'Atlas Copco MT6020'),
+(N'26.5',    N'25',   N'Caterpillar 966F'),
+(N'45/65',   N'45',   N'Caterpillar 854G'),
+(N'29.5',    N'25',   N'Komatsu WA500-7'),
+(N'20.5',    N'25',   N'Caterpillar IT28G'),
+(N'875/65',  N'33',   N'Sandvik TH663'),
+(N'35/65',   N'33',   N'Sandvik TH663'),
+(N'16.00',   N'25',   N'Omega 40C Forklift'),
+(N'45/65',   N'45',   N'Caterpillar 992G'),
+(N'26.5',    N'25',   N'Caterpillar 972'),
+(N'45/65',   N'45',   N'Caterpillar 854K'),
+(N'14.00',   N'24',   N'Hyster H9XD-EC8'),
+(N'14',      N'24',   N'Hyster H9XD-EC8'),
+(N'35/65',   N'33',   N'Sandvik LH621'),
+(N'875/65',  N'33',   N'Sandvik LH621'),
+(N'33.00',   N'51',   N'Komatsu HD1500'),
+(N'18.00',   N'25',   N'Kalmar Reach Stacker DRG 450-65'),
+(N'21.00',   N'25',   N'Kalmar 40T RTG'),
+(N'29.5',    N'29',   N'Caterpillar AD40'),
+(N'29.5',    N'25',   N'Volvo L250G'),
+(N'23.5',    N'25',   N'Komatsu WA430-6'),
+(N'875/65',  N'33',   N'Volvo  L350'),
+(N'35/65',   N'33',   N'Volvo  L350'),
+(N'50/90',   N'57',   N'Liebherr T 1272'),
+(N'29.5',    N'25',   N'Caterpillar 745C'),
+(N'875/65',  N'29',   N'Caterpillar 745C'),
+(N'33.00',   N'51',   N'Caterpillar 785'),
+(N'29.5',    N'25',   N'Caterpillar 980M'),
+(N'21.00',   N'35',   N'Kalmar CSC-440 RTG'),
+(N'23.5',    N'25',   N'Caterpillar 16M'),
+(N'24.00',   N'35',   N'Komatsu HD605-8'),
+(N'33.00',   N'51',   N'Caterpillar 785D'),
+(N'23.5',    N'25',   N'Caterpillar 18'),
+(N'24.00',   N'35',   N'Caterpillar 775F'),
+(N'29.5',    N'25',   N'Caterpillar 740C'),
+(N'37.25',   N'35',   N'Caterpillar 637B'),
+(N'50/90',   N'57',   N'Euclid R280'),
+(N'29.5',    N'25',   N'Bell B45E'),
+(N'875/65',  N'29',   N'Bell B45E'),
+(N'18.00',   N'25',   N'Kalmar Reach Stacker DRG 450-65r'),
+(N'20.5',    N'25',   N'Caterpillar 924H'),
+(N'17.5',    N'25',   N'Caterpillar 924H'),
+(N'29.5',    N'29',   N'Caterpillar 24M-r'),
+(N'875/65',  N'29',   N'Hitachi AH500'),
+(N'750/65',  N'25',   N'Caterpillar 735B'),
+(N'23.5',    N'25',   N'Caterpillar 962K'),
+(N'20.5',    N'25',   N'Caterpillar 14H'),
+(N'23.5',    N'25',   N'JCB 455ZX'),
+(N'23.5',    N'25',   N'Komatsu WA380'),
+(N'875/65',  N'33',   N'Caterpillar 988'),
+(N'35/65',   N'33',   N'Caterpillar 988'),
+(N'29.5',    N'25',   N'Komatsu HM400-5'),
+(N'50/65',   N'51',   N'Caterpillar 993K'),
+(N'50/65',   N'51',   N'Letourneau L1100 '),
+(N'23.5',    N'25',   N'Caterpillar 16H'),
+(N'35/65',   N'33',   N'Caterpillar 988G'),
+(N'875/65',  N'33',   N'Caterpillar 988G'),
+(N'15.5',    N'25',   N'Caterpillar 12G'),
+(N'14.00',   N'24',   N'Caterpillar 12G'),
+(N'17.5',    N'25',   N'Caterpillar 12G'),
+(N'13.00',   N'24',   N'Caterpillar 12G'),
+(N'21.00',   N'25',   N'Kalmar 41T RTG'),
+(N'27.00',   N'49',   N'Caterpillar 777F'),
+(N'17.5',    N'25',   N'Caterpillar 12H'),
+(N'14.00',   N'24',   N'Caterpillar 12H'),
+(N'13.00',   N'24',   N'Caterpillar 12H'),
+(N'15.5',    N'25',   N'Caterpillar 12H'),
+(N'33.25',   N'29',   N'Caterpillar 623K'),
+(N'12.00',   N'20',   N'Omega 16-6 Forklift'),
+(N'20.5',    N'25',   N'Caterpillar 926M'),
+(N'17.5',    N'25',   N'Caterpillar 926M'),
+(N'45/65',   N'45',   N'Komatsu WA900-3A'),
+(N'27.00',   N'49',   N'Caterpillar 777C'),
+(N'26.5',    N'25',   N'Caterpillar 966'),
+(N'33.00',   N'51',   N'Komatsu 510E Dresser'),
+(N'27.00',   N'49',   N'Caterpillar 777'),
+(N'40.5/75', N'39',   N'Caterpillar 657G'),
+(N'36.00',   N'51',   N'Euclid R190'),
+(N'42/90',   N'57',   N'Euclid R190'),
+(N'37.00',   N'57',   N'Euclid R190'),
+(N'23.5',    N'25',   N'Caterpillar 950G'),
+(N'33.00',   N'51',   N'Caterpillar 785C'),
+(N'45/65',   N'45',   N'Caterpillar 922G'),
+(N'35/65',   N'33',   N'Caterpillar 988H'),
+(N'875/65',  N'33',   N'Caterpillar 988H'),
+(N'40.00',   N'57',   N'Caterpillar 789'),
+(N'37.00',   N'57',   N'Caterpillar 789'),
+(N'42/90',   N'57',   N'Caterpillar 789'),
+(N'24.00',   N'35',   N'Caterpillar 773'),
+(N'27.00',   N'49',   N'Caterpillar 777E'),
+(N'45/65',   N'45',   N'Caterpillar 922K'),
+(N'12.00',   N'20',   N'Omega 16T Forklift'),
+(N'20.5',    N'25',   N'John Deere 872GP'),
+(N'550/65',  N'25',   N'John Deere 872GP'),
+(N'17.5',    N'25',   N'John Deere 872GP'),
+(N'24.00',   N'35',   N'Komatsu HD605-5'),
+(N'24.00',   N'35',   N'Caterpillar 773F'),
+(N'20.5',    N'25',   N'Caterpillar 14M'),
+(N'26.5',    N'25',   N'Komatsu WA470-8'),
+(N'45/65',   N'45',   N'Tiger 690B'),
+(N'450/95',  N'25',   N'Kalmar ESC 350W'),
+(N'16.00',   N'25',   N'Kalmar ESC 350W'),
+(N'20.5',    N'25',   N'Caterpillar 930G'),
+(N'600/65',  N'25',   N'Caterpillar 930G'),
+(N'20.5',    N'25',   N'Caterpillar IT38G'),
+(N'53/80',   N'63',   N'Hitachi EH5000 AC-3'),
+(N'20.5',    N'25',   N'Caterpillar 930H'),
+(N'600/65',  N'25',   N'Caterpillar 930H'),
+(N'40.00',   N'57',   N'Komatsu 830E'),
+(N'46/90',   N'57',   N'Komatsu 830E'),
+(N'50/80',   N'57',   N'Komatsu 830E'),
+(N'45/65',   N'45',   N'Komatsu WA900-3EO'),
+(N'46/90',   N'57',   N'Hitachi EH4000'),
+(N'40.00',   N'57',   N'Hitachi EH4000'),
+(N'23.5',    N'25',   N'Volvo L120'),
+(N'750/65',  N'25',   N'Volvo L120'),
+(N'29.5',    N'25',   N'Caterpillar 980'),
+(N'10',      N'16.5', N'Caterpillar 236D Skid Steer'),
+(N'12',      N'16.5', N'Caterpillar 236D Skid Steer'),
+(N'45/65',   N'39',   N'Komatsu WA700-3'),
+(N'18.00',   N'33',   N'Shuttle SHC 250'),
+(N'450/95',  N'25',   N'Shuttle SHC 250'),
+(N'23.5',    N'25',   N'Caterpillar 962M'),
+(N'20.5',    N'25',   N'Caterpillar 14'),
+(N'45/65',   N'45',   N'Tiger 790'),
+(N'14.00',   N'24',   N'Normet LF600 Agitator'),
+(N'53/80',   N'63',   N'Komatsu 930E'),
+(N'23.5',    N'25',   N'Caterpillar 725'),
+(N'750/65',  N'25',   N'Caterpillar 725'),
+(N'27.00',   N'49',   N'Caterpillar 777D'),
+(N'400/70',  N'24',   N'Merlo P40.17'),
+(N'400/80',  N'24',   N'Merlo P40.17'),
+(N'445/65',  N'22.5', N'Merlo P40.17'),
+(N'46/90',   N'57',   N'Caterpillar 793D'),
+(N'40.00',   N'57',   N'Caterpillar 793D'),
+(N'17.5',    N'25',   N'Komatsu GD655-5'),
+(N'23.5',    N'25',   N'Caterpillar 725C'),
+(N'750/65',  N'25',   N'Caterpillar 725C'),
+(N'10',      N'16.5', N'Bobcat Skid Steer S550'),
+(N'27.00',   N'49',   N'Komatsu HD785-5'),
+(N'14.00',   N'24',   N'Komatsu GD555'),
+(N'45/65',   N'45',   N'Caterpillar 992'),
+(N'60/80',   N'57',   N'Letourneau L1850'),
+(N'29.5',    N'25',   N'Caterpillar 740B'),
+(N'29.5',    N'29',   N'Caterpillar 24H'),
+(N'875/65',  N'29',   N'Volvo A40F'),
+(N'29.5',    N'25',   N'Volvo A40F'),
+(N'29.5',    N'25',   N'Volvo L260'),
+(N'875/65',  N'29',   N'Volvo L260'),
+(N'45/65',   N'45',   N'Letourneau L1000 '),
+(N'24.00',   N'35',   N'Komatsu HD605'),
+(N'23.5',    N'25',   N'Caterpillar 962H'),
+-- Source row was "17.5R25 | 17.5R25 | Caterpillar 160": split into width 17.5, diameter 25
+(N'17.5',    N'25',   N'Caterpillar 160'),
+(N'14.00',   N'24',   N'Caterpillar 160'),
+(N'35/65',   N'33',   N'Caterpillar 988K'),
+(N'875/65',  N'33',   N'Caterpillar 988K'),
+(N'14.00',   N'24',   N'Kalmar DCF9045E8 Forklift'),
+(N'27.00',   N'49',   N'XCMG XDR100'),
+(N'14.00',   N'24',   N'Normet Utimec 1600 Agitator'),
+(N'23.5',    N'25',   N'Caterpillar 16M-w'),
+(N'18.00',   N'25',   N'Hyster H52XD-CH6'),
+(N'29.5',    N'25',   N'Caterpillar 980G'),
+(N'750/65',  N'25',   N'Volvo A25G'),
+(N'23.5',    N'25',   N'Volvo A25G'),
+(N'29.5',    N'25',   N'Volvo A40D'),
+(N'20.5',    N'25',   N'Caterpillar 14M3'),
+(N'26.5',    N'25',   N'Caterpillar R1700'),
+(N'450/95',  N'25',   N'Kalmar ESC 350'),
+(N'16.00',   N'25',   N'Kalmar ESC 350'),
+(N'37.25',   N'35',   N'Caterpillar 637D'),
+(N'24.00',   N'35',   N'Komatsu HD605-7'),
+(N'27.00',   N'49',   N'Komatsu HD785'),
+(N'23.5',    N'25',   N'Caterpillar 950H'),
+(N'750/65',  N'25',   N'Caterpillar 730C'),
+(N'23.5',    N'25',   N'Caterpillar 730C'),
+(N'35/65',   N'33',   N'Caterpillar 834G'),
+(N'875/65',  N'33',   N'Caterpillar 834G'),
+(N'14.00',   N'24',   N'Caterpillar TH417'),
+(N'18.00',   N'33',   N'Caterpillar 769'),
+(N'18.00',   N'33',   N'Caterpillar 769D'),
+(N'29.5',    N'25',   N'Caterpillar 745'),
+(N'875/65',  N'29',   N'Caterpillar 745'),
+(N'16.00',   N'25',   N'Terex NSC-634E'),
+(N'450/95',  N'25',   N'Terex NSC-634E'),
+(N'55/80',   N'57',   N'Letourneau L1800'),
+(N'55.5/80', N'57',   N'Letourneau L1800'),
+(N'875/65',  N'29',   N'Volvo A40'),
+(N'29.5',    N'25',   N'Volvo A40'),
+(N'42/90',   N'57',   N'Caterpillar 789B-r'),
+(N'37.00',   N'57',   N'Caterpillar 789B-r'),
+(N'26.5',    N'25',   N'Komatsu WA470'),
+(N'42/90',   N'57',   N'Caterpillar 789D'),
+(N'37.00',   N'57',   N'Caterpillar 789D'),
+(N'40.00',   N'57',   N'Caterpillar 789D'),
+(N'29.5',    N'25',   N'Caterpillar 740'),
+(N'24.00',   N'35',   N'Caterpillar 775E'),
+(N'29.5',    N'25',   N'Komatsu WA500-6'),
+(N'46/90',   N'57',   N'Liebherr T 262'),
+(N'40.00',   N'57',   N'Liebherr T 262'),
+(N'23.5',    N'25',   N'Volvo L110F  '),
+(N'750/65',  N'25',   N'Volvo L110F  '),
+(N'50/90',   N'57',   N'Hitachi EH4500-2'),
+(N'50/80',   N'57',   N'Hitachi EH4500-2'),
+(N'40.00',   N'57',   N'Hitachi EH3500 AC-2'),
+(N'37.00',   N'57',   N'Hitachi EH3500 AC-2'),
+(N'10',      N'16.5', N'Caterpillar 232D Skid Steer'),
+(N'29.5',    N'25',   N'Volvo A40E'),
+(N'45/65',   N'45',   N'Caterpillar 854'),
+(N'20.5',    N'25',   N'Hitachi ZW150'),
+(N'20.5',    N'25',   N'Volvo L90E'),
+(N'650/65',  N'25',   N'Volvo L90E'),
+(N'12.00',   N'20',   N'Kalmar DCG160-12 Forklift'),
+(N'45/65',   N'45',   N'Caterpillar 992K'),
+(N'23.5',    N'25',   N'Caterpillar 16M3'),
+(N'29.5',    N'25',   N'Komatsu WA500-8');
+
+
+
+/* Normalise: trim and collapse repeated spaces in names */
+UPDATE #Rec
+SET Name       = LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(Name, '  ', ' '), '  ', ' '), '  ', ' '))),
+    WidthRatio = LTRIM(RTRIM(WidthRatio)),
+    Diameter   = LTRIM(RTRIM(Diameter));
+
+
+
+/* Remove exact duplicates within the list itself */
+;WITH d AS (
+    SELECT *, ROW_NUMBER() OVER (PARTITION BY Name, WidthRatio, Diameter ORDER BY (SELECT 0)) AS rn
+    FROM #Rec
+)
+DELETE FROM d WHERE rn > 1;
+
+
+
+/* ---------- CHECK 1: names with no matching VehicleSpecification ---------- */
+SELECT DISTINCT r.Name AS UnmatchedName
+FROM #Rec r
+WHERE NOT EXISTS (
+    SELECT 1 FROM VehicleSpecifications vs
+    WHERE ISNULL(vs.IsDeleted, 0) = 0
+      AND LTRIM(RTRIM(REPLACE(REPLACE(vs.Name, '  ', ' '), '  ', ' '))) = r.Name
+)
+ORDER BY r.Name;
+
+
+
+/* ---------- CHECK 2: names that match MORE than one VehicleSpecification ---------- */
+SELECT LTRIM(RTRIM(REPLACE(REPLACE(vs.Name, '  ', ' '), '  ', ' '))) AS Name,
+       COUNT(*) AS SpecCount,
+       STRING_AGG(CAST(vs.Id AS NVARCHAR(36)) + ISNULL(' (company ' + CAST(vs.CompanyId AS NVARCHAR(36)) + ')', ' (global)'), ', ') AS SpecIds
+FROM VehicleSpecifications vs
+WHERE ISNULL(vs.IsDeleted, 0) = 0
+  AND LTRIM(RTRIM(REPLACE(REPLACE(vs.Name, '  ', ' '), '  ', ' '))) IN (SELECT Name FROM #Rec)
+GROUP BY LTRIM(RTRIM(REPLACE(REPLACE(vs.Name, '  ', ' '), '  ', ' ')))
+HAVING COUNT(*) > 1;
+
+
+
+/* ---------- INSERT ---------- */
+BEGIN TRANSACTION;
+
+
+
+INSERT INTO VehicleSpecificationRecommendedTyres
+       (Id, VehicleSpecificationId, WidthRatio, Diameter, CreatedBy, CreatedOnUtc, ModifiedBy, ModifiedOnUtc)
+SELECT NEWID(), vs.Id, r.WidthRatio, r.Diameter, @CreatedBy, SYSUTCDATETIME(), NULL, NULL
+FROM #Rec r
+JOIN VehicleSpecifications vs
+  ON ISNULL(vs.IsDeleted, 0) = 0
+AND LTRIM(RTRIM(REPLACE(REPLACE(vs.Name, '  ', ' '), '  ', ' '))) = r.Name
+WHERE NOT EXISTS (
+    SELECT 1 FROM VehicleSpecificationRecommendedTyres x
+    WHERE x.VehicleSpecificationId = vs.Id
+      AND LTRIM(RTRIM(CAST(x.WidthRatio AS NVARCHAR(50)))) = r.WidthRatio
+      AND LTRIM(RTRIM(CAST(x.Diameter   AS NVARCHAR(50)))) = r.Diameter
+);
+
+
+
+SELECT @@ROWCOUNT AS InsertedRows;
+
+
+
+/* Preview what was inserted in this run */
+SELECT vs.Name, t.WidthRatio, t.Diameter, t.Id
+FROM VehicleSpecificationRecommendedTyres t
+JOIN VehicleSpecifications vs ON vs.Id = t.VehicleSpecificationId
+WHERE t.CreatedBy = @CreatedBy
+  AND t.CreatedOnUtc >= DATEADD(MINUTE, -5, SYSUTCDATETIME())
+ORDER BY vs.Name, t.WidthRatio;
+
+
+
+-- Review the output above, then run ONE of these in the same window:
+-- COMMIT TRANSACTION;
+-- ROLLBACK TRANSACTION;
