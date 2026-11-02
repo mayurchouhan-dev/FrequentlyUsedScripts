@@ -1,0 +1,359 @@
+/* =====================================================================
+   Insert TyreSpecificationClassifications on STAGE (all 215 rows from DEV)
+   - TyreSpecificationId -> looked up by TyreSpecifications.Name
+   - ClassificationId    -> looked up by GlobalPropertyOptions.OptionValue
+                            (classification property AAF7F650-...)
+   - Name matching ignores case and repeated spaces.
+   - Rows already present are skipped, so it is safe to rerun.
+   - Runs in a transaction: review the checks, then COMMIT or ROLLBACK.
+   ===================================================================== */
+
+
+
+SET NOCOUNT ON;
+
+
+
+DECLARE @ClassificationPropertyId UNIQUEIDENTIFIER = 'AAF7F650-3897-4196-A810-75B9458BD77E';  -- confirm on STAGE (see CHECK 0)
+
+
+
+IF OBJECT_ID('tempdb..#Src') IS NOT NULL DROP TABLE #Src;
+CREATE TABLE #Src (
+    TyreSpecName       NVARCHAR(400) NOT NULL,
+    OptionValue        NVARCHAR(400) NOT NULL,
+    ClassificationName NVARCHAR(400) NULL
+);
+
+
+
+INSERT INTO #Src (TyreSpecName, OptionValue, ClassificationName) VALUES
+(N'10-16.5 (10) Bobcat Heavy Bead Guard', N'Industrial - IND', NULL),
+(N'10-16.5 (10) LifeMaster SKZ IND TL', N'Industrial - IND', NULL),
+(N'10.00-20 Solideal Res 550 (7.5") IND TL', N'Industrial - IND', NULL),
+(N'10.00R20  XZM 166A5 IND TL', N'Industrial - IND', NULL),
+(N'10.00R20 ** MR800 166A5 IND3 TT', N'Industrial - IND3', NULL),
+(N'12-16.5 (12) SKS 775 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'12-16.5 (14) Brute ZM789 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'12.00-20 Solideal RES 550 IND TL', N'Industrial - IND', NULL),
+(N'12.00R20 ** MR800 176A5 IND4 TT', N'Industrial - IND4', NULL),
+(N'12.00R20 ** TR900 176 A5 IND3 TL', N'Industrial - IND3', N'Industrial - IND3'),
+(N'12.00R20 XZM 176A5 TL', N'Industrial - IND', NULL),
+(N'14.00-24 (24) M8802 Tuff Guard IND TT', N'Industrial - IND', NULL),
+(N'14.00R24 * Earthmax SR25 L2 TL', N'Loader & Dozer - L2', NULL),
+(N'14.00R24 * REM- 1 G2 TL', N'Grader - G2', NULL),
+(N'14.00R24 * VMTS G2A E4 TL', N'Earthmover - E4', N'Earthmover - E4'),
+(N'14.00R24 * VUT G2A G2 TL', N'Grader - G2', NULL),
+(N'14.00R24 * WB07 153A8 G2 TL', N'Grader - G2', NULL),
+(N'14.00R24 * XGL A2 L2 TL', N'Loader & Dozer - L2', NULL),
+(N'14.00R24 ** GCB2 153A8 G2 TL', N'Grader - G2', NULL),
+(N'14.00R24 *** MR800+ 193A5 IND4 TT', N'Industrial - IND4', NULL),
+(N'14.00R24 *** REM6+ IND E4', N'Industrial - IND4', NULL),
+(N'14.00R24 *** RL43 NHS IND4 TT', N'Industrial - IND4', NULL),
+(N'14.00R24 *** VCHS TG IND4 TL', N'Industrial - IND4', NULL),
+(N'14.00R24 *** VRLS E2A-LS E4 TL', N'Earthmover - E4', NULL),
+(N'14.00R24 Conti RT20 IND4 TL', N'Industrial - IND4', NULL),
+(N'14.00R24 REM-6 193A5 IND4 TT', N'Industrial - IND4', NULL),
+(N'14.00R24 TR900 193A5 TL', N'Industrial - IND4', NULL),
+(N'16.00-25 (32) ContainerMaster 196A5 IND4 TL', N'Industrial - IND4', NULL),
+(N'16.00-25 (32) StraddleMaster 196A5 IND4 TL', N'Industrial - IND4', NULL),
+(N'16.00-25 (32) TerminalMaster V.ply 196A5 IND4 TL', N'Industrial - IND4', NULL),
+(N'16.00-25 (32) Y69 PS IND3 TL', N'Industrial - IND3', NULL),
+(N'16.00R25 RR42 202A5 IND4 TL', N'Industrial - IND4', NULL),
+(N'16.00R25 VCHD IDR 200A5 IND4 TL', N'Industrial - IND4', NULL),
+(N'16.00R25 VCHR 200A5 IND4 TL', N'Industrial - IND4', NULL),
+(N'17.5R25 * Earthmax SR30 L3 TL', N'Loader & Dozer - L3', NULL),
+(N'17.5R25 * Retread CL3 G2 TL', N'Grader - G2', NULL),
+(N'17.5R25 * VJT D2A L3 TL', N'Loader & Dozer - L3', NULL),
+(N'17.5R25 * VSDL D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'17.5R25 * XH A L3 TL', N'Loader & Dozer - L3', NULL),
+(N'17.5R25 * XHA2 176A2 L3 TL', N'Loader & Dozer - L3', NULL),
+(N'17.5R25 * XTL A L2 TL', N'Loader & Dozer - L2', NULL),
+(N'17.5R25 ** MA05 182A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'17.5R25 ** REM- 12 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'18.00-25 (40) ELV-4D 4S IND4 TL', N'Industrial - IND4', NULL),
+(N'18.00-25 (40) L4- S IND4 TL', N'Industrial - IND4', NULL),
+(N'18.00-25 (40) Y69 PS IND4 TL', N'Industrial - IND4', NULL),
+(N'18.00-33 (40) ContainerMaster+ 214A5 IND4 TL', N'Industrial - IND4', NULL),
+(N'18.00-33 (40) Y69 PS IND4 TL', N'Industrial - IND4', NULL),
+(N'18.00R25 ContainerMaster 207A5 IND4 TL', N'Industrial - IND4', NULL),
+(N'20.5-25 (16) VL2 D2A L3 TL', N'Loader & Dozer - L3', NULL),
+(N'20.5R25 * Earthmax SR 30', N'Loader & Dozer - L3', NULL),
+(N'20.5R25 * Earthmax SR 53 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'20.5R25 * VKT D2A L2 TL', N'Loader & Dozer - L2', NULL),
+(N'20.5R25 * VMT D2A L3 TL', N'Loader & Dozer - L3', NULL),
+(N'20.5R25 * XH A L3 TL', N'Loader & Dozer - L3', NULL),
+(N'20.5R25 * XHA2 186A2 L3 TL', N'Loader & Dozer - L3', NULL),
+(N'20.5R25 * XLD D2 A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'20.5R25 * XTL A L2 TL', N'Loader & Dozer - L2', NULL),
+(N'20.5R25 ** Bridgestone VSDL D2A L5', N'Loader & Dozer - L5', NULL),
+(N'20.5R25 ** MA08 193A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'21.00-25 (36) SE 188 Regular IND3 TL', N'Industrial - IND3', NULL),
+(N'21.00-25 (40) CraneMaster 213 A5 E3 TL', N'Earthmover - E3', N'Earthmover - E3'),
+(N'21.00-25 (40) EL 27 IND3 TL', N'Industrial - IND3', NULL),
+(N'21.00-25 (40) TerminalMaster V.Ply 213A5 IND3 TL', N'Industrial - IND3', NULL),
+(N'21.00-25 (40) XL-Grip 213A2 IND3 TL', N'Industrial - IND3', NULL),
+(N'21.00-25 (40) Y 67 IND3 TL', N'Industrial - IND3', NULL),
+(N'21.00-35 (40) CraneMaster 219A5 IND3 TL', N'Industrial - IND3', NULL),
+(N'21.00R35 ** VELS E1A E4 TL', N'Earthmover - E4', N'Earthmover - E4'),
+(N'225/75-15 7" Industry S 146A5 IND', N'Industrial - IND', NULL),
+(N'225/75-15 7" Industry SIT 146A5 IND', N'Industrial - IND', NULL),
+(N'225/75R15 XZM 149A5 IND TL', N'Industrial - IND', NULL),
+(N'23.5-25 (20) G12 AL368 L3', N'Loader & Dozer - L3', NULL),
+(N'23.5-25 (24) L-5 A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 * RL51 CP L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 * XHA2 195A2 L3 TL', N'Loader & Dozer - L3', NULL),
+(N'23.5R25 * XLD D2 A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 * XRD 1A L4 TL', N'Loader & Dozer - L4', NULL),
+(N'23.5R25 * XTL A L2 TL', N'Loader & Dozer - L2', NULL),
+(N'23.5R25 ** ETDL5 201A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 ** GC A8 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 ** HR-L5 201A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 ** MA08 201A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 ** MS 503 201A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 ** RL-5K 4S L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 ** RT 5C L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 ** Re Tread L5 TL', N'Loader & Dozer - L5', N'Loader & Dozer - L5'),
+(N'23.5R25 ** TB 516 L3 TL', N'Loader & Dozer - L3', NULL),
+(N'23.5R25 ** TL538 S+ L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 ** VJT D2A L3 TL', N'Loader & Dozer - L3', NULL),
+(N'23.5R25 ** VSDL D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'23.5R25 ** VSDT D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'250-15 Globestar WT Clip (7.5") IND3', N'Industrial - IND3', NULL),
+(N'26.5-25 (36) SMO D/L-5C 6S L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'26.5R25 (24) VL2 D2A TL', N'Loader & Dozer - L3', NULL),
+(N'26.5R25 * VMT D2A L3 TL', N'Loader & Dozer - L3', NULL),
+(N'26.5R25 ** MA08 209A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'26.5R25 ** RL45 CP E4/L4 TL', N'Loader & Dozer - L4', NULL),
+(N'26.5R25 ** VSDL D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'26.5R25 ** VSNT D2A L4 TL', N'Loader & Dozer - L4', NULL),
+(N'26.5R25 ** XHA2 209A2 L3 TL', N'Loader & Dozer - L3', NULL),
+(N'27.00R49 ** Re Tread E4 TL', N'Earthmover - E4', N'Earthmover - E4'),
+(N'28x9-15 Solideal Magnum RES 550 (7")', N'Industrial - IND3', NULL),
+(N'29.5-25 (28) G 12 L3 TL', N'Loader & Dozer - L3', NULL),
+(N'29.5-25 (28) Y524 CP L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5-29 (34) STMS D2A L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'29.5-29 (34) Y69K CP-S L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'29.5-29 (40) SMO-5C 6S L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'29.5-29 (40) Y69K CP L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'29.5-29 (40) Y69K CP-S L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'29.5R25 * Earthmax SR 50 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5R25 * VJT D2A L3 TL', N'Loader & Dozer - L3', NULL),
+(N'29.5R25 * XH A L3 TL', N'Loader & Dozer - L3', NULL),
+(N'29.5R25 * XLD D2 A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5R25 ** EM Master E4, L4 TL', N'Earthmover - E4', N'Earthmover - E4'),
+(N'29.5R25 ** EM Master E4, L4 TL', N'Loader & Dozer - L4', N'Loader & Dozer - L4'),
+(N'29.5R25 ** Earthmax SR 41 E4, L4 TL', N'Earthmover - E4', N'Earthmover - E4'),
+(N'29.5R25 ** Earthmax SR 41 E4, L4 TL', N'Loader & Dozer - L4', N'Loader & Dozer - L4'),
+(N'29.5R25 ** MA 08 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5R25 ** RL-5K 4S L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5R25 ** VSDL D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5R25 ** VSDT D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5R25 ** VSNT DE2 E4/L4 TL', N'Loader & Dozer - L4', NULL),
+(N'29.5R25 ** XHA2 216A2 L3 TL', N'Loader & Dozer - L3', NULL),
+(N'29.5R25 *** XMine D2 Pro L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5R25 EM-Master  200B E3, L3 TL', N'Earthmover - E3', N'Earthmover - E3'),
+(N'29.5R25 EM-Master  200B E3, L3 TL', N'Loader & Dozer - L3', N'Loader & Dozer - L3'),
+(N'29.5R29 ** ETD2 218A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5R29 ** Goodyear RL-5K 4S L5', N'Loader & Dozer - L5', NULL),
+(N'29.5R29 ** MA05S 218A2 L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'29.5R29 ** MA08 218A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5R29 ** VSDT D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'29.5R29 ** VSMS2 L2A L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'29.5R29 ** XSM D2+ L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'29.5R29 *** Earthmax SR 49 M L4 TL', N'Loader & Dozer - L4', NULL),
+(N'29.5R29 *** RL-5S 223A2 L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'300-15 Globestar WT Solid Clip (8")', N'Industrial - IND3', NULL),
+(N'300-15 Globestar WT Solid Std (8")', N'Industrial - IND3', NULL),
+(N'35/65-33 (36) NRL D/L-5A 6S L5 TL', N'Loader & Dozer - L5', NULL),
+(N'35/65-33 (42) BEL -283 L4 TL', N'Loader & Dozer - L4', NULL),
+(N'35/65-33 (42) DL D2V L5 TL', N'Loader & Dozer - L5', NULL),
+(N'35/65-33 (42) Duraload DT STC NY L4 TL', N'Loader & Dozer - L4', NULL),
+(N'35/65-33 (42) SE 65 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'35/65-33 (42) Y524 CP L5 TL', N'Loader & Dozer - L5', NULL),
+(N'35/65-33 (42) Y69K CP-S L5 TL', N'Loader & Dozer - L5S', NULL),
+(N'35/65R33 ** MA08 224A2 L4 TL', N'Loader & Dozer - L4', NULL),
+(N'35/65R33 ** MA08 224A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'35/65R33 ** RL-5K 4S L5 TL', N'Loader & Dozer - L5', NULL),
+(N'35/65R33 ** SR 49 CR L4 TL', N'Loader & Dozer - L4', NULL),
+(N'35/65R33 ** VSDL D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'35/65R33 ** VSNL D2A L4 TL', N'Loader & Dozer - L4', NULL),
+(N'35/65R33 ** VSNT D2A L4 TL', N'Loader & Dozer - L4', NULL),
+(N'35/65R33 ** XLD  D2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'35/65R33 ** XLD D1 A L4 TL', N'Loader & Dozer - L4', NULL),
+(N'35/65R33 ** XR DN A L3 TL', N'Loader & Dozer - L3', NULL),
+(N'35/65R33 *** MA07+ 229A2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'35/65R33 **** ETDL5 225 A8 L5 TL', N'Loader & Dozer - L5', N'Loader & Dozer - L5'),
+(N'35/65R33 **** ETNT 229A2 L4 TL', N'Loader & Dozer - L4', NULL),
+(N'37.00R57 ** RL-4M+ 2HL E4 TL', N'Earthmover - E4', N'Earthmover - E4'),
+(N'37.00R57 ** RL-4M+ 2SL E4 TL', N'Earthmover - E4', N'Earthmover - E4'),
+(N'400/70-24 (14) MP 600 IND3 TL', N'Industrial - IND3', NULL),
+(N'45.65-45 (1) RETREAD RE L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65-45 (1) RETREAD RE L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65-45 (58) DL D2V L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65-45 (58) DL D2V L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'45/65-45 (58) G 65 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65-45 (58) L 5 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65-45 (58) NRL D/L-5A 2S L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65-45 (58) Y524 CP L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65-45 (58) Y545 CP L4 TL', N'Loader & Dozer - L4', NULL),
+(N'45/65R39 * VSDL D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65R39 ** XLD D2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65R39 ** XMine D2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65R45 ** Earthmax SR 53 CR L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65R45 ** RL-5K 4S L5S TL', N'Loader & Dozer - L5S', NULL),
+(N'45/65R45 ** VSDL D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65R45 ** VSNL D2A L4 TL', N'Loader & Dozer - L4', NULL),
+(N'45/65R45 ** XLD D1 L4 TL', N'Loader & Dozer - L4', NULL),
+(N'45/65R45 ** XLD D2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65R45 ** XMine D2 L5 TL', N'Loader & Dozer - L5', NULL),
+(N'45/65R45 *** VSDL D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'450/95R25 ** X-Straddle 2 202 A7 IND4 TL', N'Industrial - IND4', NULL),
+(N'450/95R25 StraddleMaster 204A5 IND4 TL', N'Industrial - IND4', NULL),
+(N'50/65R51 ** VSDL D2A L5 TL', N'Loader & Dozer - L5', NULL),
+(N'500-8 Rodaco R@ Resilient (3")', N'Industrial - IND3', NULL),
+(N'52/80-57 (68) HRL D/L-4G 4S L4 TL', N'Loader & Dozer - L4', NULL),
+(N'55/80R57 ** XMine D2 SR L5 TL', N'Loader & Dozer - L5', NULL),
+(N'550/65R25 * XLD 65 L3 TL', N'Loader & Dozer - L3', NULL),
+(N'6.00-9 (10) Maxam MS801', N'Industrial - IND', NULL),
+(N'6.00-9 Barum STD (4")', N'Industrial - IND3', NULL),
+(N'6.00-9 Globestar WT Clip (4")', N'Industrial - IND3', NULL),
+(N'6.00-9 Maxam MS701+ Solid (4")', N'Industrial - IND3', NULL),
+(N'6.50-10 Adtrak Resilient (5")', N'Industrial - IND3', NULL),
+(N'6.50-10 Barum Solid STD (5")', N'Industrial - IND3', NULL),
+(N'6.50-10 Globestar WT Clip (5")', N'Industrial - IND3', NULL),
+(N'6.50-10 Globestar WT STD', N'Industrial - IND3', NULL),
+(N'6.50-10 Maxam MS702 Solid (5")', N'Industrial - IND3', NULL),
+(N'6.50R10 XZM 128A5 TL', N'Industrial - IND3', NULL),
+(N'7.00-12 Barum STD (5")', N'Industrial - IND3', NULL),
+(N'7.00-12 Globestar WT Clip (5")', N'Industrial - IND3', NULL),
+(N'7.00-12 Maxam MS701+ Solid (5")', N'Industrial - IND3', NULL),
+(N'7.00-12 Rodaco R2 Resilient (5")', N'Industrial - IND3', NULL),
+(N'7.00R12 XZM 136A5 TL', N'Industrial - IND3', NULL),
+(N'8.15-15 Globestar WT Clip (7")', N'Industrial - IND3', NULL),
+(N'8.15-15 Globestar WT STD (7")', N'Industrial - IND3', NULL),
+(N'8.25-15 Adtrak Resilient (6.5")', N'Industrial - IND3', NULL),
+(N'8.25-15 Barum Clip (6.5")', N'Industrial - IND3', NULL),
+(N'8.25-15 Maxam MS701+ Solid (6.5")', N'Industrial - IND3', NULL),
+(N'8.25R15 XZM 153A5 TL', N'Industrial - IND3', NULL),
+(N'875/65R29 ** RT41 CP E4, L4 TL', N'Earthmover - E4', N'Earthmover - E4'),
+(N'875/65R29 ** RT41 CP E4, L4 TL', N'Loader & Dozer - L4', N'Loader & Dozer - L4'),
+(N'875/65R33 ** RL-4K 6S L4 TL', N'Loader & Dozer - L4', NULL),
+(N'875/65R33 ** RT-4D Hi Stability E4/L4 TL', N'Loader & Dozer - L4', NULL),
+(N'875/65R33 *** RL-5K 4S L5 TL', N'Loader & Dozer - L5', NULL),
+(N'9.00-20 (14) Solideal Air 550 TT', N'Industrial - IND3', NULL),
+(N'9.00R20 XZM 160A5 TL', N'Industrial - IND3', NULL)
+;
+
+
+
+/* Normalised keys: lower-case, trimmed, repeated spaces collapsed */
+ALTER TABLE #Src ADD NameKey NVARCHAR(400), ValueKey NVARCHAR(400);
+UPDATE #Src
+SET NameKey  = LOWER(LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(TyreSpecName, '  ', ' '), '  ', ' '), '  ', ' ')))),
+    ValueKey = LOWER(LTRIM(RTRIM(OptionValue)));
+
+
+
+/* ---------- CHECK 0: is the classification property the same on STAGE? ---------- */
+SELECT COUNT(*) AS ClassificationOptionsOnStage
+FROM GlobalPropertyOptions
+WHERE PropertyId = @ClassificationPropertyId;   -- 0 means the PropertyId differs on STAGE; change the variable
+
+
+
+/* Lookups on STAGE: one row per name / value */
+IF OBJECT_ID('tempdb..#Spec') IS NOT NULL DROP TABLE #Spec;
+SELECT Id, NameKey
+INTO #Spec
+FROM (
+    SELECT Id,
+           LOWER(LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(Name, '  ', ' '), '  ', ' '), '  ', ' ')))) AS NameKey,
+           ROW_NUMBER() OVER (PARTITION BY LOWER(LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(Name, '  ', ' '), '  ', ' '), '  ', ' '))))
+                              ORDER BY ISNULL(IsDeleted, 0),
+                                       CASE WHEN CompanyId IS NULL THEN 0 ELSE 1 END,
+                                       CreatedOnUtc) AS rn
+    FROM TyreSpecifications
+) x
+WHERE rn = 1;
+
+
+
+IF OBJECT_ID('tempdb..#Opt') IS NOT NULL DROP TABLE #Opt;
+SELECT Id, ValueKey
+INTO #Opt
+FROM (
+    SELECT Id,
+           LOWER(LTRIM(RTRIM(OptionValue))) AS ValueKey,
+           ROW_NUMBER() OVER (PARTITION BY LOWER(LTRIM(RTRIM(OptionValue))) ORDER BY CreatedOnUtc) AS rn
+    FROM GlobalPropertyOptions
+    WHERE PropertyId = @ClassificationPropertyId
+) x
+WHERE rn = 1;
+
+
+
+/* ---------- CHECK 1: tyre spec names not found on STAGE (these rows are skipped) ---------- */
+SELECT DISTINCT s.TyreSpecName AS MissingTyreSpecOnStage
+FROM #Src s
+LEFT JOIN #Spec sp ON sp.NameKey = s.NameKey
+WHERE sp.Id IS NULL
+ORDER BY 1;
+
+
+
+/* ---------- CHECK 2: classification options not found on STAGE (these rows are skipped) ---------- */
+SELECT DISTINCT s.OptionValue AS MissingOptionOnStage
+FROM #Src s
+LEFT JOIN #Opt o ON o.ValueKey = s.ValueKey
+WHERE o.Id IS NULL
+ORDER BY 1;
+
+
+
+/* ---------- CHECK 3: spec names that exist more than once on STAGE ---------- */
+SELECT LOWER(LTRIM(RTRIM(t.Name))) AS DuplicateNameOnStage, COUNT(*) AS Copies
+FROM TyreSpecifications t
+WHERE LOWER(LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(t.Name, '  ', ' '), '  ', ' '), '  ', ' ')))) IN (SELECT NameKey FROM #Src)
+GROUP BY LOWER(LTRIM(RTRIM(t.Name)))
+HAVING COUNT(*) > 1;
+
+
+
+/* ---------- INSERT ---------- */
+BEGIN TRANSACTION;
+
+
+
+INSERT INTO TyreSpecificationClassifications (Id, TyreSpecificationId, ClassificationId, ClassificationName)
+SELECT NEWID(), sp.Id, o.Id, s.ClassificationName
+FROM #Src s
+JOIN #Spec sp ON sp.NameKey = s.NameKey
+JOIN #Opt  o  ON o.ValueKey = s.ValueKey
+WHERE NOT EXISTS (
+    SELECT 1 FROM TyreSpecificationClassifications x
+    WHERE x.TyreSpecificationId = sp.Id
+      AND x.ClassificationId    = o.Id
+);
+
+
+
+SELECT @@ROWCOUNT AS InsertedRows,
+       (SELECT COUNT(*) FROM #Src) AS SourceRows;
+
+
+
+/* Preview */
+SELECT ts.Name AS TyreSpec, gpo.OptionValue AS Classification, tsc.ClassificationName, tsc.Id
+FROM TyreSpecificationClassifications tsc
+JOIN TyreSpecifications    ts  ON ts.Id  = tsc.TyreSpecificationId
+JOIN GlobalPropertyOptions gpo ON gpo.Id = tsc.ClassificationId
+JOIN #Spec sp ON sp.Id = ts.Id
+JOIN #Src  s  ON s.NameKey = sp.NameKey AND s.ValueKey = LOWER(LTRIM(RTRIM(gpo.OptionValue)))
+ORDER BY ts.Name, gpo.OptionValue;
+
+
+
+-- Review the checks and preview, then run ONE of these in the same window:
+-- COMMIT TRANSACTION;
+-- ROLLBACK TRANSACTION;
