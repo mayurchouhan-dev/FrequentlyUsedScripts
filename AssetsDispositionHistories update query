@@ -1,0 +1,6 @@
+UPDATE ad
+SET ad.SiteId = ta.SiteId
+FROM dbo.AssetsDispositionHistories ad
+INNER JOIN dbo.TyreAssets ta ON ad.AssetId = ta.Id
+WHERE ad.AssetType = 'TYRE' and TenantId='6934D078-F3E0-4166-A4B5-347CF5A186BA'
+  AND ad.SiteId = '00000000-0000-0000-0000-000000000000';
