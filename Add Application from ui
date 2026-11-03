@@ -1,0 +1,67 @@
+select * from Properties where name = 'Application' and
+TenantId='6B65587D-01C1-4A0C-9BCA-DD83495B188F'
+
+ 
+select  * from PropertyOptions where CompanyPropertyId='2C2DADE9-D439-4738-A7DC-B5C663152B25'
+
+ 
+INSERT INTO PropertyOptions
+(
+    Id,
+    TenantId,
+    CompanyPropertyId,
+    OptionValue,
+    IsDefault,
+    DisplayOrder,
+    CreatedBy,
+    CreatedOnUtc,
+    ModifiedBy,
+    ModifiedOnUtc,
+    CompanySettingId,
+    IsSelected,
+    CanAdd,
+    CanDelete,
+    CanEdit,
+    OptionLabel
+)
+SELECT
+    NEWID(),
+    '7E702CC1-65FA-4357-A4E6-72A7DFDFE5CC',
+    'EFB59F02-1BBA-4D79-8743-D1446505D293',
+    v.OptionValue,
+    1,
+    NULL,
+    '00000000-0000-0000-0000-000000000000',
+    GETUTCDATE(),
+    '00000000-0000-0000-0000-000000000000',
+    GETUTCDATE(),
+    'BCF8FAE7-90BA-4EA8-BF9E-24C03911E736',
+    0,
+    1,
+    0,
+    0,
+    NULL
+FROM (VALUES
+    ('Earthmoving - E1'),
+    ('Earthmoving - E2'),
+    ('Earthmoving - E3'),
+    ('Earthmoving - E4'),
+    ('Grader - G2'),
+    ('Grader - G3'),
+    ('Grader - G4'),
+    ('Industrial - IND3'),
+    ('Industrial - IND4'),
+    ('Loader & Dozer - L2'),
+    ('Loader & Dozer - L3'),
+    ('Loader & Dozer - L4'),
+    ('Loader & Dozer - L5'),
+    ('Loader & Dozer - L5S'),
+    ('Wheel Loader')
+) AS v(OptionValue)
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM PropertyOptions p
+    WHERE p.CompanyPropertyId = 'EFB59F02-1BBA-4D79-8743-D1446505D293'
+      AND p.TenantId          = '7E702CC1-65FA-4357-A4E6-72A7DFDFE5CC'
+      AND p.OptionValue       = v.OptionValue
+);
