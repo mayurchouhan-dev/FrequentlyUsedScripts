@@ -1,0 +1,99 @@
+SELECT
+    vs.Uid,
+    vs.SpecificationName,
+    vs.RecommendedTyreSteer,
+    vs.RecommendedTyreDrive,
+    t.value                                       AS TyreSize,
+    LEFT(t.value, p.pos - 1)                      AS WidthRatio,
+    SUBSTRING(t.value, p.pos + 1, LEN(t.value))   AS Diameter
+FROM Tbl_Vehicle_Specification vs
+CROSS APPLY (
+    SELECT DISTINCT LTRIM(RTRIM(x.value)) AS value
+    FROM (VALUES (vs.RecommendedTyreSteer), (vs.RecommendedTyreDrive)) x(value)
+    WHERE x.value IS NOT NULL AND LTRIM(RTRIM(x.value)) <> ''
+) t
+CROSS APPLY (SELECT PATINDEX('%[R-]%', t.value) AS pos) p
+WHERE vs.CompanyId IS NULL
+  AND vs.SpecificationName IN (
+'Baumann Sumitra manjan',
+'Atlas Copco fsdfsdf',
+'Caterpillar R2900 XE',
+'Caterpillar 994F',
+'Caterpillar 994D',
+'Caterpillar 789A',
+'Bell test',
+'Atlas Copco test6',
+'Volvo L350',
+'Volvo A40G',
+'Caterpillar 773B',
+'Atlas Copco 6020',
+'Atlas Copco fsdsdfsdfs',
+'Caterpillar 950 GC',
+'Caterpillar Telehandler',
+'Komatsu WA320',
+'Komatsu WA1200',
+'Apple Abhishek',
+'Caterpillar 994A',
+'Caterpillar 982',
+'Caterpillar 785 Watercart',
+'Komatsu WA900-8',
+'Atlas Copco Abhishek',
+'Caterpillar 24',
+'Caterpillar 992C',
+'Atlas Copco fssd',
+'Caterpillar 14 VIJAY',
+'Default',
+'Volvo L250H'
+  )
+  AND p.pos > 1
+ORDER BY vs.SpecificationName;
+
+SELECT
+    vs.Uid,
+    vs.SpecificationName,
+    vs.RecommendedRimWheel,
+    LTRIM(RTRIM(LEFT(r.value, CHARINDEX('x', r.value) - 1)))           AS BeforeX,
+    LTRIM(RTRIM(SUBSTRING(r.value, CHARINDEX('x', r.value) + 1, LEN(r.value)))) AS AfterX
+FROM Tbl_Vehicle_Specification vs
+CROSS APPLY (SELECT LTRIM(RTRIM(vs.RecommendedRimWheel)) AS value) r
+WHERE vs.CompanyId IS NULL
+  AND r.value IS NOT NULL AND r.value <> ''
+  AND CHARINDEX('x', r.value) > 1
+  AND vs.SpecificationName IN (
+'Baumann Sumitra manjan',
+'Atlas Copco fsdfsdf',
+'Caterpillar R2900 XE',
+'Caterpillar 994F',
+'Caterpillar 994D',
+'Caterpillar 789A',
+'Bell test',
+'Atlas Copco test6',
+'Volvo L350',
+'Volvo A40G',
+'Caterpillar 773B',
+'Atlas Copco 6020',
+'Atlas Copco fsdsdfsdfs',
+'Caterpillar 950 GC',
+'Caterpillar Telehandler',
+'Komatsu WA320',
+'Komatsu WA1200',
+'Apple Abhishek',
+'Caterpillar 994A',
+'Caterpillar 982',
+'Caterpillar 785 Watercart',
+'Komatsu WA900-8',
+'Atlas Copco Abhishek',
+'Caterpillar 24',
+'Caterpillar 992C',
+'Atlas Copco fssd',
+'Caterpillar 14 VIJAY',
+'Default',
+'Volvo L250H'
+  )
+ORDER BY vs.SpecificationName;
+
+select * from VehicleSpecifications where id not in 
+(select VehicleSpecificationId from VehicleSpecificationRecommendedTyres)
+
+select * from VehicleSpecifications where id not in 
+(select VehicleSpecificationId from VehicleSpecificationRecommendedRims)
