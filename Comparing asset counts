@@ -1,0 +1,31 @@
+select * from RimAssets where specificationid='F2AA9841-C2D1-4D84-B628-CBAC685A7D1F'
+and IsDeleted=0
+
+select * from TyreAssets where specificationid='6BE4A9C1-F030-44D1-A4F1-EB66FDAB7B60'
+and IsDeleted=0
+
+select tod.serialnumber, tod.Specification, ts.sitename from Tbl_tyre_asset tod
+inner join tbl_company tc on tod.companyid=tc.uid
+inner join tbl_site ts on tod.siteid=ts.uid
+where tod.companyid=1169
+and serialnumber in (
+'XD3SDA0012',
+'OLK0351E8A',
+'XD2SOA0031',
+'XD3SBA002T',
+'AD7SDA002T'
+)
+order by ts.sitename
+
+select * from VehicleAssets where specificationid='A1495028-BD64-4B9E-98C1-F6D60BF4E98F'
+and isdeleted=0
+
+select tod.AssetNumber, tod.VehicleSpecification, ts.sitename from Tbl_Vehicle_Asset tod
+inner join tbl_company tc on tod.companyid=tc.uid
+inner join tbl_site ts on tod.siteid=ts.uid
+where tod.companyid=1169
+and tod.AssetNumber in (
+'718',
+'611'
+)
+order by ts.sitename
