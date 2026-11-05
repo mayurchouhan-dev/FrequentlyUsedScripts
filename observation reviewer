@@ -25,3 +25,40 @@ commit
 
 select * from Tbl_ObservationDetail where uid=3500
 update Tbl_ObservationDetail set reviewer_id=3311 where uid=3500
+
+
+;with src as (
+    select Uid, ObservationNumber, ObservationStatus, SignatureManagerDate, ManagerReviewComment, createdDate,
+           case when ltrim(rtrim(isnull(ManagementReview, ''))) = '' then null
+                else right(ManagementReview, charindex('/', reverse(ManagementReview)) - 1) end as RevFile,
+           '_' + cast(Uid as varchar(20)) as S,
+           replace(ObservationNumber, '''', '''''') as ObsNo
+    from Tbl_ObservationDetail
+    where Uid in (7042,7147,7179,7180,7276,7277,7297,7350,7362,7363,7364,7366,7369,7370,
+                  7415,7433,7476,7477,7478,7491,7496,7497,7532,7535,7647,7700,7701,7702,7703,7767)
+)
+select
+  'DECLARE @Cnt' + S + ' int = (SELECT COUNT(*) FROM SafetyObservations WHERE ObservationNumber = ''' + ObsNo + '''); '
++ 'DECLARE @SoId' + S + ' uniqueidentifier = (SELECT TOP 1 Id FROM SafetyObservations WHERE ObservationNumber = ''' + ObsNo + '''); '
++ 'DECLARE @RevUser' + S + ' uniqueidentifier = ''CAA2A1FA-B782-4EB6-AB5D-2DCABA1F0D18''; '
++ 'DECLARE @CreatedBy' + S + ' uniqueidentifier = (SELECT CreatedBy FROM SafetyObservations WHERE Id = @SoId' + S + '); '
++ 'DECLARE @RevId' + S + ' uniqueidentifier = NEWID(), @DocId' + S + ' uniqueidentifier = NEWID(); '
++ 'IF @SoId' + S + ' IS NULL PRINT ''SKIP ' + ObsNo + ' - observation not in V3''; '
++ 'ELSE IF @Cnt' + S + ' > 1 PRINT ''SKIP ' + ObsNo + ' - matches more than one V3 observation''; '
++ 'ELSE IF EXISTS (SELECT 1 FROM SafetyObservationReviews WHERE SafetyObservationId = @SoId' + S + ') PRINT ''SKIP ' + ObsNo + ' - review already exists''; '
++ 'ELSE BEGIN '
++   'INSERT INTO Documents (Id, DocumentPath, Name, Size, DocTypeCode, LevelId, LevelTypeCode, CreatedBy, CreatedOnUtc) VALUES (@DocId' + S + ', '
++   '''https://mtv3storage.blob.core.windows.net/tmass-documents/migration/' + replace(isnull(RevFile, 'MigratedNoSignature.png'), '''', '''''') + ''', '
++   '''' + replace(isnull(RevFile, 'MigratedNoSignature'), '''', '''''') + ''', ''100'', ''image/png'', @RevId' + S + ', ''OBSERVATIONREVIEWER'', @CreatedBy' + S + ', '
++   isnull('''' + convert(varchar(23), createdDate, 121) + '''', 'NULL') + '); '
++   'INSERT INTO SafetyObservationReviews (Id, SafetyObservationId, ReviewDate, ReviewedById, AdditionalComment, SignatureId, CreatedBy, CreatedOnUtc, ReviewedByType) VALUES (@RevId' + S + ', @SoId' + S + ', '
++   isnull('''' + convert(varchar(23), SignatureManagerDate, 121) + '''', 'NULL') + ', @RevUser' + S + ', '
++   isnull('''' + replace(ManagerReviewComment, '''', '''''') + '''', 'NULL') + ', @DocId' + S + ', @CreatedBy' + S + ', '
++   isnull('''' + convert(varchar(23), createdDate, 121) + '''', 'NULL') + ', ''USER''); '
++   'UPDATE SafetyObservations SET IsReviewed = 1, IsApproved = ' + case when ObservationStatus = 1 then '1' else '0' end + ' WHERE Id = @SoId' + S + '; '
++   'PRINT ''Fixed ' + ObsNo + '''; '
++ 'END;'
+as FixScript
+from src
+order by Uid;
+
