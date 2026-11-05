@@ -1,0 +1,27 @@
+begin tran
+
+update tod
+set tod.SignatureManagerDate = dateadd(day, 1, tod.[Date])
+from Tbl_ObservationDetail tod
+inner join tbl_company tc on tod.companyid = tc.uid
+inner join tbl_site ts on tod.siteid = ts.uid
+where tod.companyid = 1158
+  and tod.reviewer_id = 0
+  and tod.ObservationStatus = 2
+  and ts.SiteName='Gunnedah';
+
+select tod.Uid, ts.sitename, tod.[Date], tod.SignatureManagerDate,
+       dateadd(day, 1, tod.[Date]) as NewSignatureManagerDate
+from Tbl_ObservationDetail tod
+inner join tbl_company tc on tod.companyid = tc.uid
+inner join tbl_site ts on tod.siteid = ts.uid
+where tod.companyid = 1158
+  and tod.reviewer_id = 0
+  and tod.ObservationStatus = 2
+  and ts.SiteName='Gunnedah'
+order by ts.sitename;
+
+commit
+
+select * from Tbl_ObservationDetail where uid=3500
+update Tbl_ObservationDetail set reviewer_id=3311 where uid=3500
