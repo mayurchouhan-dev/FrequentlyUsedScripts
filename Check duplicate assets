@@ -1,0 +1,57 @@
+SELECT
+    LTRIM(RTRIM(SerialNumber))                   AS SerialNumber,
+    COUNT(*)                                     AS DuplicateCount,
+    STRING_AGG(CAST(Id AS NVARCHAR(50)), ', ')
+        WITHIN GROUP (ORDER BY Id)               AS DuplicateIds
+FROM TyreAssets
+WHERE TenantId = 'ACCF0084-2EDE-4E78-9383-965977FBB10A'
+--  AND SiteId   = '24B53DF7-1F96-4236-BACA-01A78F5FB577'
+GROUP BY LTRIM(RTRIM(SerialNumber))
+HAVING COUNT(*) > 1
+ORDER BY DuplicateCount DESC, SerialNumber;
+
+
+fix
+BEGIN TRAN;
+ 
+-- Bad copies: the Default-spec row for each serial that also has a non-Default row
+SELECT ta.Id
+INTO #BadTyres
+FROM TyreAssets ta
+WHERE ta.TenantId = 'ACCF0084-2EDE-4E78-9383-965977FBB10A'
+  AND ta.SiteId   = 'CC0B21E4-28FC-48E5-A1F3-9C69AB312CC2'
+  AND ta.SpecificationId = '6BE4A9C1-F030-44D1-A4F1-EB66FDAB7B60'
+  AND EXISTS (
+        SELECT 1 FROM TyreAssets t2
+        WHERE t2.TenantId = ta.TenantId
+          AND t2.SiteId   = ta.SiteId
+          AND t2.SerialNumber = ta.SerialNumber
+          AND t2.Id <> ta.Id
+          AND t2.SpecificationId <> '6BE4A9C1-F030-44D1-A4F1-EB66FDAB7B60'
+      );
+ 
+SELECT * FROM #BadTyres;   -- expect 6 rows (FEL034POS1–POS6)
+ 
+DELETE tr FROM TreadDepths tr JOIN #BadTyres b ON tr.TyreId = b.Id;
+DELETE ta FROM TyreAssets  ta JOIN #BadTyres b ON ta.Id     = b.Id;
+ 
+--commit
+--ROLLBACK;   -- change to COMMIT once the counts look right
+--DROP TABLE IF EXISTS #BadTyres;
+ 
+SELECT
+    LTRIM(RTRIM(SerialNumber))                   AS SerialNumber,
+    COUNT(*)                                     AS DuplicateCount,
+    STRING_AGG(CAST(Id AS NVARCHAR(50)), ', ')
+        WITHIN GROUP (ORDER BY Id)               AS DuplicateIds,
+    STRING_AGG(CAST(SpecificationId AS NVARCHAR(50)), ', ')
+        WITHIN GROUP (ORDER BY Id)               AS SpecificationIds
+FROM TyreAssets
+WHERE TenantId = 'ACCF0084-2EDE-4E78-9383-965977FBB10A'
+  AND SiteId   = 'CC0B21E4-28FC-48E5-A1F3-9C69AB312CC2'
+GROUP BY LTRIM(RTRIM(SerialNumber))
+HAVING COUNT(*) > 1
+ORDER BY DuplicateCount DESC, SerialNumber;
+ 
+select * from TyreAssets where tenantid='ACCF0084-2EDE-4E78-9383-965977FBB10A'
+and SiteId='CC0B21E4-28FC-48E5-A1F3-9C69AB312CC2' and IsDeleted=0
