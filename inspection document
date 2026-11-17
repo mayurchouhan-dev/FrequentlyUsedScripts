@@ -1,0 +1,172 @@
+SELECT '(' + CAST(img.Uid AS varchar(20)) + ',' 
+           + CAST(img.InspectionId AS varchar(20)) + ',N'''
+           + i.InspectionNumber + ''',N'''
+           + REPLACE(img.ImageURL, '''', '''''') + '''),'
+FROM Tbl_Inspection_Images img
+JOIN Tbl_Inspection i ON i.uid = img.InspectionId
+WHERE i.CompanyId = 1169
+  AND img.DamageRecordId < 0
+ORDER BY img.Uid;
+
+SET NOCOUNT ON;
+
+IF OBJECT_ID('tempdb..#img') IS NOT NULL DROP TABLE #img;
+CREATE TABLE #img (
+    InspectionNumber nvarchar(50),
+    ImageURL         nvarchar(1000)
+);
+
+INSERT INTO #img (InspectionNumber, ImageURL) VALUES
+(N'57PH-XPF8',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_207217b0-5d6a-4506-95ff-28eb3153e005.png'),
+(N'57PH-XPF8',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_f2b6fe72-2a89-4a63-9c1d-588bf2583996.png'),
+(N'XZAF-DPTS',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_3b0b77ff-6dae-4c58-bcd3-5e00af965b8a.png'),
+(N'XZAF-DPTS',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_4e84998d-fa16-42d7-b3f7-327698242097.png'),
+(N'XZAF-DPTS',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_bed9aeee-f6c6-485c-bac8-88aa85699374.png'),
+(N'EO9T-0N07',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_06b474b1-9318-4d1f-8ebb-922a56bdd4b9.png'),
+(N'5Y7J-YHIZ',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_efb8f5ff-e977-407e-8e98-b2ac84546afc.png'),
+(N'JJYS-Z3HQ',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_cfb61bad-35d9-40ac-a3ab-9a4f0b5ff0a8.png'),
+(N'LQTC-U5LF',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_810b6c6e-f41e-4aeb-b180-d6d313ed1cb4.png'),
+(N'QLCE-1TCT',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_01920387-5b45-4dd9-a5ad-69ce499d40ca.png'),
+(N'QLCE-1TCT',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_4f466551-533b-43f9-b0b9-51b3f0fd911b.png'),
+(N'2F2O-DEFO',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_6752faa6-0b72-428f-af84-e5907737bab1.png'),
+(N'16Q7-DURW',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_936519df-664e-4213-b4f0-6317ea8b3b3c.png'),
+(N'TGJY-NYET',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_e9779169-2a2e-4bd2-a56e-7f3c7389a0ac.png'),
+(N'TEQT-TOP3',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_78584ef6-0a13-4bb3-beb4-66dce065ca99.png'),
+(N'MJ8U-LPRI',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_c415d7e1-5e89-4ea7-9de8-9b4973823ab4.png'),
+(N'6BLH-B12L',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_5dcb7e32-5cba-441a-b86f-016a63aa3ec0.png'),
+(N'DPFW-IUHA',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_db5c7670-7b3c-4d5a-bf59-6a40f7f042a5.png'),
+(N'FQVY-ANHC',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_f36670a2-b1a7-4054-9a6c-212a60acefec.png'),
+(N'CGNR-IXKQ',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_acf43fab-e750-4155-93cd-114badd05b1a.png'),
+(N'CGNR-IXKQ',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_5a2a5b2d-c1db-45e1-83e5-f62fc4db5a1c.png'),
+(N'LWGW-XTPV',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_fbd2c6c7-75fb-4a8b-94c2-1789194df188.png'),
+(N'DUHG-XWYY',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_d7482011-ac4b-47a5-9346-b0a0c6fc5d9b.png'),
+(N'BBUB-BDMU',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_6868a392-72d3-4b9d-9001-0940a71f7805.jpg'),
+(N'BIPP-NMTQ',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_6fdcbfa2-e02a-4859-aa02-9886c45ed255.jpg'),
+(N'8AZO-N6LK',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_fa5a37d1-d66f-4fbd-9508-7f42fc2c0ede.JPG'),
+(N'JSWZ-7LYD',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_459ffc13-3c76-420b-b242-d59cb87dd901.JPG'),
+(N'JTJP-6KA3',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_072ccb49-6740-4ded-a683-e667325c75c5.JPG'),
+(N'5SDY-KARJ',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_89a1a901-8e5a-492d-a5c9-f97852bdbee4.JPG'),
+(N'OCV3-QOAW',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_0c940333-664b-48ff-8224-cee348ec8ea0.JPG'),
+(N'YHJ0-NZX6',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_81224433-a517-4d6d-8002-983988d40f3d.png'),
+(N'PZGL-DCVD',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_bf2896c2-34f8-43b3-9cc8-04497fcd33c3.png'),
+(N'UFLP-JD1F',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_20a35f9b-eb95-4b11-9a46-bba4f15bdbd4.png'),
+(N'OIIO-HW8R',N'https://pilotstorage.blob.core.windows.net/pilotimages/image_3373af67-9809-4ffc-b693-ff7cca990d55.png');
+
+DECLARE @TenantId uniqueidentifier = '839240CE-A87C-48CA-AA30-D1A68D98EDF4';
+
+/* A1. Inspection numbers NOT found exactly once (no rows = all good) */
+SELECT g.InspectionNumber, COUNT(DISTINCT i.Id) AS MatchesInNewDb
+FROM (SELECT DISTINCT InspectionNumber FROM #img) g
+LEFT JOIN Inspections i
+       ON i.InspectionNumber = g.InspectionNumber
+      AND i.TenantId = @TenantId
+GROUP BY g.InspectionNumber
+HAVING COUNT(DISTINCT i.Id) <> 1;
+
+/* A2. Rows for Part B (copy the whole output column) */
+SELECT '(N''' + CAST(i.Id AS nvarchar(36)) + ''',N'''
+     + RIGHT(g.ImageURL, CHARINDEX('/', REVERSE(g.ImageURL)) - 1) + ''','
+     + CASE WHEN i.CreatedBy     IS NULL THEN 'NULL' ELSE 'N''' + REPLACE(CAST(i.CreatedBy  AS nvarchar(200)), '''', '''''') + '''' END + ','
+     + CASE WHEN i.CreatedOnUtc  IS NULL THEN 'NULL' ELSE '''' + CONVERT(varchar(33), i.CreatedOnUtc, 126) + '''' END + ','
+     + CASE WHEN i.ModifiedBy    IS NULL THEN 'NULL' ELSE 'N''' + REPLACE(CAST(i.ModifiedBy AS nvarchar(200)), '''', '''''') + '''' END + ','
+     + CASE WHEN i.ModifiedOnUtc IS NULL THEN 'NULL' ELSE '''' + CONVERT(varchar(33), i.ModifiedOnUtc, 126) + '''' END
+     + '),' AS RowForPartB
+FROM #img g
+JOIN Inspections i
+     ON i.InspectionNumber = g.InspectionNumber
+    AND i.TenantId = @TenantId
+ORDER BY g.InspectionNumber;
+
+SET NOCOUNT ON;
+
+IF OBJECT_ID('tempdb..#doc') IS NOT NULL DROP TABLE #doc;
+CREATE TABLE #doc (
+    InspectionId  nvarchar(36),
+    FileName      nvarchar(500),
+    CreatedBy     nvarchar(200),
+    CreatedOnUtc  datetime2,
+    ModifiedBy    nvarchar(200),
+    ModifiedOnUtc datetime2
+);
+
+INSERT INTO #doc (InspectionId, FileName, CreatedBy, CreatedOnUtc, ModifiedBy, ModifiedOnUtc) VALUES
+(N'A27490B5-C63F-4197-B1B6-DC27A1D5C0BC',N'image_936519df-664e-4213-b4f0-6317ea8b3b3c.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2017-06-15T01:43:27',NULL,'2017-06-15T01:43:27'),
+(N'9115D5BB-B585-47FC-A72C-6B8629F49102',N'image_6752faa6-0b72-428f-af84-e5907737bab1.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2017-06-15T01:11:48',NULL,'2017-06-15T01:11:48'),
+(N'CB21DA2A-FF01-489C-ABEF-CE054431E60D',N'image_207217b0-5d6a-4506-95ff-28eb3153e005.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2015-07-01T23:58:40',NULL,'2015-07-01T23:58:40'),
+(N'CB21DA2A-FF01-489C-ABEF-CE054431E60D',N'image_f2b6fe72-2a89-4a63-9c1d-588bf2583996.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2015-07-01T23:58:40',NULL,'2015-07-01T23:58:40'),
+(N'5DA1EC41-1A39-44B2-8D18-F755C003AE2C',N'image_89a1a901-8e5a-492d-a5c9-f97852bdbee4.JPG',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-09-06T16:17:58.6100000',NULL,'2021-09-06T16:17:58.6100000'),
+(N'67FAD0FC-1B58-4BB0-9BBA-4B4D1FA66E16',N'image_efb8f5ff-e977-407e-8e98-b2ac84546afc.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2015-07-02T00:22:10',NULL,'2015-07-02T00:22:10'),
+(N'B659C131-CD10-4804-BA69-63E15728ED67',N'image_5dcb7e32-5cba-441a-b86f-016a63aa3ec0.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2019-11-30T10:17:13',NULL,'2019-11-30T10:17:13'),
+(N'F4C45DBF-D31A-4311-BD24-74165479500B',N'image_fa5a37d1-d66f-4fbd-9508-7f42fc2c0ede.JPG',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-08-14T05:38:34.9400000',NULL,'2021-08-14T05:38:34.9400000'),
+(N'FD427036-DF8E-402F-863E-C4562044C097',N'image_6868a392-72d3-4b9d-9001-0940a71f7805.jpg',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-08-09T21:02:28.6930000',NULL,'2021-08-09T21:02:28.6930000'),
+(N'D256692C-DF38-4A0B-871F-F9471BA2338F',N'image_6fdcbfa2-e02a-4859-aa02-9886c45ed255.jpg',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-08-09T21:20:03.4000000',NULL,'2021-08-09T21:20:03.4000000'),
+(N'B14206FC-ADB9-4E14-B153-AC41B3CEF201',N'image_acf43fab-e750-4155-93cd-114badd05b1a.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2020-02-22T09:56:15',NULL,'2020-02-22T09:56:15'),
+(N'B14206FC-ADB9-4E14-B153-AC41B3CEF201',N'image_5a2a5b2d-c1db-45e1-83e5-f62fc4db5a1c.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2020-02-22T09:56:15',NULL,'2020-02-22T09:56:15'),
+(N'6205BF16-FC6E-4483-9C7E-D50FCF455942',N'image_db5c7670-7b3c-4d5a-bf59-6a40f7f042a5.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2019-11-30T10:30:42',NULL,'2019-11-30T10:30:42'),
+(N'2948D1EB-6128-4BBB-9B6E-D8FDB4C17BCE',N'image_d7482011-ac4b-47a5-9346-b0a0c6fc5d9b.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2020-02-29T08:38:47',NULL,'2020-02-29T08:38:47'),
+(N'9DF50367-3969-4659-BEF4-F21E7590D429',N'image_06b474b1-9318-4d1f-8ebb-922a56bdd4b9.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2015-07-02T00:14:09',NULL,'2015-07-02T00:14:09'),
+(N'6A2A1AC4-1276-4ED0-AD9B-C9BF0D650B48',N'image_f36670a2-b1a7-4054-9a6c-212a60acefec.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2019-12-04T14:10:14',NULL,'2019-12-04T14:10:14'),
+(N'89C91DC8-9BB9-43E5-B2E8-E5DD0E7A4582',N'image_459ffc13-3c76-420b-b242-d59cb87dd901.JPG',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-08-14T05:46:49.0270000',NULL,'2021-08-14T05:46:49.0270000'),
+(N'2CFC003F-4827-4C67-9AE1-EBFC4A366418',N'image_072ccb49-6740-4ded-a683-e667325c75c5.JPG',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-08-14T05:49:37.2300000',NULL,'2021-08-14T05:49:37.2300000'),
+(N'7D76425E-B8DB-4229-9843-0014764A91B7',N'image_810b6c6e-f41e-4aeb-b180-d6d313ed1cb4.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2017-06-15T00:59:43',NULL,'2017-06-15T00:59:43'),
+(N'0CB0DA1D-BFD9-4212-85DC-F8770BC22BE4',N'image_fbd2c6c7-75fb-4a8b-94c2-1789194df188.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2020-02-26T14:00:37',NULL,'2020-02-26T14:00:37'),
+(N'72EC64FF-9D7C-4C0F-932B-FB6C410E9435',N'image_c415d7e1-5e89-4ea7-9de8-9b4973823ab4.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2019-11-09T11:29:17',NULL,'2019-11-09T11:29:17'),
+(N'9AF84800-ADBD-451F-AF5D-864A92B08A8E',N'image_0c940333-664b-48ff-8224-cee348ec8ea0.JPG',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-09-06T16:19:01.6200000',NULL,'2021-09-06T16:19:01.6200000'),
+(N'83D080E8-370B-4591-9D33-B92B6F58AAAF',N'image_3373af67-9809-4ffc-b693-ff7cca990d55.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-10-01T06:19:30',NULL,'2021-10-01T06:19:30'),
+(N'69FD4785-75DB-4072-B671-66DED7935102',N'image_bf2896c2-34f8-43b3-9cc8-04497fcd33c3.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-09-25T08:49:26',NULL,'2021-09-25T08:49:26'),
+(N'F158B50A-28D2-470B-86D7-F9D9B98F52AC',N'image_01920387-5b45-4dd9-a5ad-69ce499d40ca.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2017-06-15T01:06:33',NULL,'2017-06-15T01:06:33'),
+(N'F158B50A-28D2-470B-86D7-F9D9B98F52AC',N'image_4f466551-533b-43f9-b0b9-51b3f0fd911b.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2017-06-15T01:06:33',NULL,'2017-06-15T01:06:33'),
+(N'64EBFE07-F2FB-4096-8A4C-551C0F43B4CE',N'image_78584ef6-0a13-4bb3-beb4-66dce065ca99.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2018-01-09T09:45:36',NULL,'2018-01-09T09:45:36'),
+(N'916D8AE1-00C9-4C9C-9FFC-436EE7190BF7',N'image_e9779169-2a2e-4bd2-a56e-7f3c7389a0ac.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2017-06-15T02:14:43',NULL,'2017-06-15T02:14:43'),
+(N'7E0CC302-8DC6-42F5-90E7-4AB0AD1254CF',N'image_20a35f9b-eb95-4b11-9a46-bba4f15bdbd4.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-09-25T09:37:46',NULL,'2021-09-25T09:37:46'),
+(N'C703A9C5-6966-45FD-990E-29798AA05C45',N'image_3b0b77ff-6dae-4c58-bcd3-5e00af965b8a.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2015-07-02T00:10:32',NULL,'2015-07-02T00:10:32'),
+(N'C703A9C5-6966-45FD-990E-29798AA05C45',N'image_4e84998d-fa16-42d7-b3f7-327698242097.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2015-07-02T00:10:32',NULL,'2015-07-02T00:10:32'),
+(N'C703A9C5-6966-45FD-990E-29798AA05C45',N'image_bed9aeee-f6c6-485c-bac8-88aa85699374.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2015-07-02T00:10:32',NULL,'2015-07-02T00:10:32'),
+(N'5B9D3F9F-1C47-485D-9B7B-40A952A3A792',N'image_81224433-a517-4d6d-8002-983988d40f3d.png',N'B6F40F46-0912-4569-BA63-6EFF94E0BE78','2021-09-18T10:39:22',NULL,'2021-09-18T10:39:22');
+
+SELECT COUNT(*) AS SourceRows FROM #doc;   -- expect 33
+
+/* B1. Preview */
+SELECT s.InspectionId, s.FileName,
+       CASE WHEN EXISTS (SELECT 1 FROM Documents d
+                         WHERE TRY_CAST(d.LevelId AS uniqueidentifier) = TRY_CAST(s.InspectionId AS uniqueidentifier)
+                           AND d.Name = s.FileName)
+            THEN 'Already exists (skipped)' ELSE 'OK' END AS Status
+FROM #doc s
+ORDER BY Status DESC, s.InspectionId;
+
+/* B2. Insert */
+BEGIN TRAN;
+
+INSERT INTO Documents
+    (Id, DocumentPath, Name, Size, DocTypeCode, LevelId, LevelTypeCode,
+     CreatedBy, CreatedOnUtc, ModifiedBy, ModifiedOnUtc)
+SELECT NEWID(),
+       'https://mtv3storage.blob.core.windows.net/tmass-documents/migration/' + s.FileName,
+       s.FileName,
+       NULL,
+       NULL,
+       s.InspectionId,
+       'INSPECTION',
+       s.CreatedBy, s.CreatedOnUtc, s.ModifiedBy, s.ModifiedOnUtc
+FROM #doc s
+WHERE NOT EXISTS (SELECT 1 FROM Documents d
+                  WHERE TRY_CAST(d.LevelId AS uniqueidentifier) = TRY_CAST(s.InspectionId AS uniqueidentifier)
+                    AND d.Name = s.FileName);
+
+SELECT @@ROWCOUNT AS RowsInserted;   -- should equal the 'OK' count in B1 (max 33)
+
+/* B3. Verify */
+SELECT d.Id, d.Name, d.DocumentPath, d.LevelId, d.LevelTypeCode, d.CreatedBy, d.CreatedOnUtc
+FROM Documents d
+JOIN #doc s
+  ON TRY_CAST(d.LevelId AS uniqueidentifier) = TRY_CAST(s.InspectionId AS uniqueidentifier)
+ AND d.Name = s.FileName
+ORDER BY d.LevelId, d.Name;
+
+-- COMMIT;     -- if RowsInserted and the verify output look right
+-- ROLLBACK;   -- to undo
+
+/* Cleanup after COMMIT/ROLLBACK:
+DROP TABLE IF EXISTS #doc;
+*/
