@@ -124,6 +124,11 @@ WHERE i.TenantId = @TenantId;
 -- COMMIT;     -- run if RowsUpdated and the verify output look right
 -- ROLLBACK;   -- run to undo
 
+/* ===== 6. Cleanup (after COMMIT/ROLLBACK) =====
+DROP TABLE IF EXISTS #src;
+DROP TABLE IF EXISTS #preview;
+DROP TABLE IF EXISTS #backup;
+
 
 
 BEGIN TRAN;
