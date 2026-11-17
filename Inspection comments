@@ -1,0 +1,146 @@
+SELECT ti.InspectionNumber,
+       tti.TyreSerialNumber,
+       tti.CreationDate,
+       tti.TyreHours,
+       tti.Kilometers,
+       tti.Notes
+FROM Tbl_Inspection ti
+INNER JOIN Tbl_Inspection_TyrePositionSpecific_Data tti
+    ON ti.uid = tti.InspectionId
+WHERE ti.CompanyId = 1169
+  AND ti.AssetTypeId IN (2, 3)
+  AND tti.Notes <> ''
+ORDER BY ti.CreationDate DESC, tti.TyreSerialNumber;
+
+
+
+/* ===== 1. Source data from the old DB ===== */
+IF OBJECT_ID('tempdb..#src') IS NOT NULL DROP TABLE #src;
+
+SELECT * INTO #src FROM (VALUES
+('F7HR-QFHZ','HY3WHB001T','2023-07-24 04:15:58.233',4451,'Circumferential split on the bead toe on one side - almost 360 degrees'),
+('8JHC-I3WE','YVF0010M2B','2021-09-21 02:12:18.653',5304,'Flat at inspection'),
+('QHCZ-SFOK','RLG0421T9A','2021-09-06 15:56:18.883',4505,'Valve Cover Plate Loose'),
+('BEP3-HWQF','BVU8063M2A','2021-08-14 05:47:39.220',9602,'Valve cover Plate is missing a bolt'),
+('71WB-HXUJ','RLM0083F1A','2020-05-30 01:08:19.633',7077,'Pos.5&6 low Tread'),
+('M7OW-4SE6','LLM0333F1A','2020-05-30 00:04:29.073',7563,'Low tread depth pos.5&6'),
+('GTXL-WREV','PLK0002A3A','2020-03-02 19:43:29.837',5779,'All rear tyres. Are low threaded and in poor condition, monitor for scrap out'),
+('VQTT-ALXX','ZVF1048V1B','2020-02-28 22:18:24.060',5195,'Continue to monitor sidewall pos.4'),
+('DUHG-XWYY','OLG0655T8A','2020-02-28 22:18:23.810',1525,'Possible strut leak to be repaired or hose leak'),
+('DUHG-XWYY','PLM0329F5A','2020-02-28 22:18:23.797',6268,'Monitor pos5 scrap, tread chunking out'),
+('W7KW-0MJ4','BCG0934F9A','2020-02-26 03:24:58.420',538,'Remove front tyres and fit to pos.3&4 which are worn out'),
+('AWXU-ELAX','AL6KHA002T','2020-02-21 23:00:14.077',2144,'Pos.2 low tread depth , remove for rear run out'),
+('GVL3-HRGQ','IVF1010F7A','2020-02-14 23:09:22.883',5444,'Continue to monitor sidewall damage on pos.3'),
+('ABDF-VYZZ','PLM0337F7A','2020-02-14 21:50:38.560',6431,'Sidewall cutting on pos 6 to monitor'),
+('NIAN-G1LX','OLG0760T3A','2020-02-06 03:30:35.857',911,'Bead erosion pos.1. 5/1/2020'),
+('G48V-5DYE','TLT0398T7B','2020-02-06 03:30:35.767',1814,'Remove pos.1 due to excessive bead erosion 5/1/2020'),
+('G48V-5DYE','VVU0003T6B','2020-02-06 03:30:35.757',2058,'Remove pos.1'),
+('A7KR-QCBL','XVU1006U3A','2020-02-05 02:58:13.557',2934,'Rear tyres in poor condition 5/2/2020'),
+('GTYL-SVE5','FVE1023L6A','2019-12-01 18:51:42.247',8269,'Pos1&2 wheeloverdue  for scheduled crack testing'),
+('DPFW-IUHA','SLL0216F2Y','2019-11-29 23:32:32.083',4972,'Valve cover plate loose'),
+('6BLH-B12L','RLG0265A2A','2019-11-29 23:23:27.393',161,'Leaking O ring'),
+('0LIV-CWBC','S0NRC0031','2019-11-29 23:23:24.903',2793,'Cracking at shoulders of pos(1&2 ,fatigue? Continue to run out'),
+('WPAK-YUXO','VVC0078U0A','2019-11-29 23:23:24.320',8538,'Casing fatigue evident on all rear tyres'),
+('PJHH-UCMM','NLT0549F1A','2019-11-29 22:09:50.730',3413,'Continue to monitor pos5&6 for scrap, low Tread and sidewall fatigue'),
+('GOF1-DTI4','FPD0148A7A','2019-11-27 20:41:02.103',3824,'Continue to monitor for scrap- old inner sidewall repair done at retread factory'),
+('DCMO-EPHL','CVV5121E4A','2019-11-27 20:40:58.590',6048,'Continue to monitor for scrap'),
+('DCMO-EPHL','LLR0044A5B','2019-11-27 20:40:58.603',6791,'Continue to monitor for scrap'),
+('ZTWL-ON1A','VCL0010U6A','2019-11-13 07:52:53.930',3423,'Low tread pos.6'),
+('KTHS-2AVP','RLL0431E5Y','2019-11-02 09:24:00.547',5342,'Tread separation around crown belts exposed and damaged over 6 lugs'),
+('HOPT-WRDB','HLS0349S3A','2019-11-02 09:24:00.413',5884,'Rock cut separation in crown belts exposed and damaged'),
+('VHRV-R5YP','LLM0403F1A','2019-11-02 09:23:59.207',6107,'Worn out belts exposed'),
+('IDC0-2OOE','YVI0140A9A','2019-11-02 08:22:17.707',5159,'Low tread'),
+('IQLW-006A','NLL0495V2Y','2019-11-01 23:18:07.093',10033,'Low tread'),
+('3O3U-H8SS','SLS0004E6B','2019-11-01 23:18:04.543',8083,'Low tread'),
+('3O3U-H8SS','SLS0012E8B','2019-11-01 23:18:04.520',8083,'Low tread'),
+('TRDA-DYHE','AVF1006S2A','2019-11-01 22:42:16.993',5783,'Minor sidewall cutting'),
+('LZUB-V6QU','VVX0129G4A','2018-07-01 23:35:15.643',6932,'tyre removed for inspection - low pressure  tyre OK - new O ring fitted'),
+('TQKJ-RQGO','KLR0003G3B','2018-06-14 20:45:52.533',9910,'slow leak - replace O ring'),
+('TQKJ-RQGO','NLL0497V0Y','2018-06-14 20:45:52.533',9927,'slow leak - replace O ring'),
+('DBFC-XNZB','S2Y004972','2017-06-15 20:25:50.390',3000,'Front tyres due to remove for rear run out'),
+('16Q7-DURW','EVX0648F6B','2017-06-15 01:52:10.753',2959,'Already a xxx')
+) v (InspectionNumber, TyreSerialNumber, OldCreationDate, OldTyreHours, OldNotes);
+
+DECLARE @TenantId uniqueidentifier = '839240CE-A87C-48CA-AA30-D1A68D98EDF4';
+
+/* ===== 2. Preview ===== */
+SELECT s.InspectionNumber, s.TyreSerialNumber,
+       i.Id AS InspectionId, itp.Id AS ItpId,
+       s.OldTyreHours, itp.TyreHours,
+       itp.ScrapReasonNotes AS CurrentNotes, s.OldNotes,
+       CASE WHEN i.Id IS NULL   THEN 'Inspection missing'
+            WHEN itp.Id IS NULL THEN 'Tyre row missing'
+            ELSE 'OK' END AS Status
+FROM #src s
+LEFT JOIN Inspections i
+       ON i.InspectionNumber = s.InspectionNumber
+      AND i.TenantId = @TenantId
+LEFT JOIN InspectionTyrePositionSpecificDatas itp
+       ON itp.InspectionId = i.Id
+      AND itp.TyreSerialNumber = s.TyreSerialNumber
+      AND itp.TyreHours = s.OldTyreHours
+ORDER BY Status DESC, s.InspectionNumber;
+
+/* ===== 3. Backup of the rows that will change ===== */
+IF OBJECT_ID('tempdb..#backup') IS NOT NULL DROP TABLE #backup;
+
+SELECT itp.Id, itp.ScrapReasonNotes
+INTO #backup
+FROM InspectionTyrePositionSpecificDatas itp
+JOIN Inspections i ON i.Id = itp.InspectionId
+JOIN #src s
+     ON s.InspectionNumber = i.InspectionNumber
+    AND s.TyreSerialNumber = itp.TyreSerialNumber
+    AND s.OldTyreHours     = itp.TyreHours
+WHERE i.TenantId = @TenantId;
+
+/* ===== 4. Update ===== */
+--BEGIN TRAN;
+
+--UPDATE itp
+--SET itp.ScrapReasonNotes = s.OldNotes
+--FROM InspectionTyrePositionSpecificDatas itp
+--JOIN Inspections i ON i.Id = itp.InspectionId
+--JOIN #src s
+--     ON s.InspectionNumber = i.InspectionNumber
+--    AND s.TyreSerialNumber = itp.TyreSerialNumber
+--    AND s.OldTyreHours     = itp.TyreHours
+--WHERE i.TenantId = @TenantId
+--  AND ISNULL(itp.ScrapReasonNotes, '') = '';
+
+--SELECT @@ROWCOUNT AS RowsUpdated;
+
+--/* ===== 5. Verify ===== */
+--SELECT i.InspectionNumber, itp.TyreSerialNumber, itp.TyreHours, itp.ScrapReasonNotes
+--FROM InspectionTyrePositionSpecificDatas itp
+--JOIN Inspections i ON i.Id = itp.InspectionId
+--JOIN #src s
+--     ON s.InspectionNumber = i.InspectionNumber
+--    AND s.TyreSerialNumber = itp.TyreSerialNumber
+--    AND s.OldTyreHours     = itp.TyreHours
+--WHERE i.TenantId = @TenantId
+--ORDER BY i.InspectionNumber;
+
+-- COMMIT;     -- run if RowsUpdated and the verify output look right
+-- ROLLBACK;   -- run to undo
+
+
+
+BEGIN TRAN;
+
+UPDATE i
+SET i.Hours    = itp.TyreHours,
+    i.Distance = itp.Kilometers,
+    i.Notes    = itp.Comments
+FROM Inspections i
+INNER JOIN InspectionTyrePositionSpecificDatas itp ON itp.InspectionId = i.Id
+WHERE i.VehicleId IS NULL;
+
+-- check the result
+SELECT Id, Hours, Distance, Notes
+FROM Inspections
+WHERE VehicleId IS NULL
+ORDER BY CreatedOnUtc DESC;
+
+-- COMMIT;   -- if it looks right
+-- ROLLBACK; -- if not
