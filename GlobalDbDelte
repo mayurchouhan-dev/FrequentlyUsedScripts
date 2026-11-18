@@ -10,9 +10,7 @@
 --select * from Tenants where name like '%bloom%'
 
 --to do--
---delete from GlobalOperationHistorys--
 
---delete from Documents
 
 
 
@@ -176,6 +174,10 @@ BEGIN TRY
     DELETE FROM tenants WHERE id IN (SELECT tenantid FROM Companys WHERE id = @CompanyId);
 
     DELETE FROM Companys WHERE id = @CompanyId;
+
+    delete from GlobalOperationHistorys
+
+   delete from Documents
 
     -- Decide whether to commit or rollback based on parameter
     IF @CommitTransaction = 1
